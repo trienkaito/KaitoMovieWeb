@@ -1,0 +1,28 @@
+﻿@model List<MoviesWebsite.Models.Movie.Movie>
+
+    @foreach (var movie in Model)
+    {
+        <div class="slide-it">
+            <div class="movie-item">
+            <div class="mv-img fixed-height">
+                <img class="fixed-height-img" src="@movie.Image" alt="@movie.Title" />
+                </div>
+                <div class="hvr-inner">
+                <a asp-area="" asp-controller="Home" asp-action="Detail" asp-route-slug="@movie.Slug">
+                        Read more   
+                        <i class="ion-android-arrow-dropright"></i>
+                    </a>
+                </div>
+                <div class="title-in">
+                <h6><a asp-area="" asp-controller="Home" asp-action="Detail" asp-route-slug="@movie.Slug">@movie.Title</a></h6>
+                    <p>
+                        <i class="ion-android-star"></i>
+                        <span>@movie.Rate</span> /10
+                        <span style="font-size: 16px; margin-left: 10px; color: #FFDB00">@movie.View Views</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+    }
+

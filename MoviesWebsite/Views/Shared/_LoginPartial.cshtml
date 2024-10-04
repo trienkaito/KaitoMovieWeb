@@ -1,0 +1,34 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using MoviesWebsite.Models
+
+@inject SignInManager<AppUser> SignInManager
+@inject UserManager<AppUser> UserManager
+
+@if (SignInManager.IsSignedIn(User))
+{
+    <form asp-area="Identity" asp-controller="Account" asp-action="LogOff" method="post" id="logoutForm"
+        class="nvabar-right">
+        <ul class="nav navbar-nav navbar-right">
+            <li class="nav-item">
+                <a class="nav-link text-info" asp-area="Identity" asp-controller="Manage" asp-action="Index"
+                    title="Manage"><i class="far fa-user"></i> @UserManager.GetUserName(User)!</a>
+            </li>
+            <li class="nav-item">
+                <button title="Log out" type="submit"
+                    style="border: none;background-color: transparent;cursor: pointer;padding-right: 24px;"><i
+                        class="fas fa-sign-out-alt" style="color: #abb7c4;"></i>
+                </button>
+            </li>
+        </ul>
+    </form>
+}
+else
+{
+    <ul class="nav navbar-nav navbar-right">
+        <li class="nav-item">
+            <a title="Log in" class="nav-link text-info" asp-area="Identity" asp-controller="Account" asp-action="Login">
+                <i class="fas fa-sign-in-alt"></i>
+            </a>
+        </li>
+    </ul>
+}

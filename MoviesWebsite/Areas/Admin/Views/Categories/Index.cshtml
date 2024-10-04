@@ -1,0 +1,193 @@
+﻿@using MoviesWebsite.Data
+@using MoviesWebsite.Models.Movie
+@model IEnumerable<MoviesWebsite.Models.Movie.Category>
+@inject AdminSidebarService _AdminSidebarService
+@{
+    ViewData["Title"] = "Manager Category";
+    Category categoryModel;
+
+}
+
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <div class="d-flex">
+            <div class="" style="flex: 1">
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCategory">
+                    Add Category
+                </button>
+            </div>
+            <form asp-action="Index" method="get">
+                <div class="input-group ml-3" style="flex: 1">
+                    <input type="text" name="searchString" class="form-control bg-light border-0 small"
+                        placeholder="Search for..." value="@ViewData["searchString"]" aria-label="Search"
+                        aria-describedby="basic-addon2" />
+                    <div class="input-group-append">
+                        <button class="btn btn-primary" type="submit">
+                            <i class="fas fa-search fa-sm"></i>
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>
+                            @Html.DisplayNameFor(model => model.Title)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.Description)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.Slug)
+                        </th>
+                        <th></th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td onclick="detailItem(@item.CategoryId)" style="cursor: pointer">
+                                @Html.DisplayFor(modelItem => item.Title)
+                            </td>
+
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Description)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Slug)
+                            </td>
+
+                            <td class="text-center">
+                                <a id="@item.CategoryId" class="text-warning btn-circle"
+                                    onclick="editItem(@item.CategoryId)">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+
+                                <a id="@item.CategoryId" class="text-danger btn-circle"
+                                    onclick="deleteItem(@item.CategoryId)">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            <!-- //paging -->
+
+        </div>
+    </div>
+</div>
+
+<!-- Add Movie Modal-->
+@{
+    categoryModel = new Category();
+}
+<partial name="_AddCategory" model="@categoryModel" />
+
+<!-- Edit Modal-->
+<div id="edit">
+</div>
+
+<!-- Detail Modal-->
+<div id="detail">
+</div>
+
+<!-- delete -->
+<div id="delete">
+</div>
+
+<!-- paging -->
+<div class="float-right">
+    <partial name="_PagingXTL" model="@ViewBag.pagingmodel" />
+</div>
+
+@section Scripts {
+
+    <script>
+        function editItem(id) {
+            $.ajax({
+                url: '@Url.ActionLink("EditPartialView", "Categories")/' + id,
+                type: 'GET',
+                success: function (response) {
+                    $('#edit').html(response)
+                    $("#editCategory").modal("show");
+                },
+                error: function (error) {
+                    console.log("error")
+                }
+            });
+        };
+
+        function detailItem(id) {
+            $.ajax({
+                url: '@Url.ActionLink("DetailsPartialView", "Categories")/' + id,
+                type: 'GET',
+                success: function (response) {
+                    $('#detail').html(response)
+                    $("#detailCategory").modal("show");
+                },
+                error: function (error) {
+                    console.log("error")
+                }
+            });
+        };
+
+        function deleteItem(id) {
+            swal({
+                title: "Are you sure?",
+                text: "Once deleted you will not be able to recover this data!",
+                icon: "warning",
+                buttons: true,
+                dangerMode: true,
+            }).then((willDelete) => {
+                if (willDelete) {
+                    $.ajax({
+                        url: '@Url.ActionLink("DeletePartialView", "Categories")/' + id,
+                        type: 'GET',
+                        success: function (response) {
+                            $('#delete').html(response)
+                            $('#delete-form').submit();
+                            swal("Your data has been deleted!", {
+                                icon: "success",
+                            }).then(() => {
+                                ;
+                            });
+                        },
+                        error: function (error) {
+                            swal("Error", {
+                                icon: "warning",
+                            });
+                        }
+                    });
+
+                }
+            });
+        }
+    </script>
+
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
+
+@{
+    var user = await _userManager.GetUserAsync(this.User);
+    var hidden = true;
+    if (user != null)
+    {
+        var roles = await _userManager.GetRolesAsync(user);
+        hidden = !roles.Any(r => r == RoleName.Administrator);
+    }
+    _AdminSidebarService.SetActive("categories", "Index", "Admin",hidden);
+}
+
+@section Sidebar
+{
+    @Html.Raw(_AdminSidebarService.renderHtml())
+}

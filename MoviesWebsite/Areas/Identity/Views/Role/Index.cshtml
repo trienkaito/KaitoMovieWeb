@@ -1,0 +1,45 @@
+@using MoviesWebsite.Data
+@model List<RoleModel>
+@inject AdminSidebarService _AdminSidebarService
+@{
+    ViewData["Title"] = "List of role";
+}
+
+<partial name="_StatusMessage"></partial>
+
+
+<div class="mb-2">
+    <a class="btn btn-secondary" asp-action="Index" asp-controller="User">Manage user</a>
+</div>
+
+<table class="table">
+    <tr>
+        <th>Role name</th>
+        <th>Claims</th>
+    </tr>
+    @foreach (var role in Model)
+    {
+        <tr>
+            <td>
+                <p>@role.Name</p>
+                @foreach (var claim in @role.Claims)
+                {
+                    <small>@claim</small><br>
+                }
+            </td>
+            <td>
+                <a class="btn btn-success btn-sm" asp-action="Edit" asp-route-roleid="@role.Id">Update</a>
+                <a class="btn btn-success btn-sm" asp-action="Delete" asp-route-roleid="@role.Id">Delete</a>
+            </td>
+        </tr>
+    }
+</table>
+
+@{
+    _AdminSidebarService.SetActive("Role", "Index", "Identity");
+}
+
+@section Sidebar
+{
+    @Html.Raw(_AdminSidebarService.renderHtml())
+}

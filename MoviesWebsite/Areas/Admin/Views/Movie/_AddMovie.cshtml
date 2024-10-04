@@ -1,0 +1,180 @@
+﻿@using MoviesWebsite.Areas.Admin.Models
+@model MovieCreate
+
+<div class="modal fade" id="addMovie" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content" style="width: 700px">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Movie</h5>
+                <button class="close" type="button" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form method="post" asp-action="Create" id="addMovieForm" enctype="multipart/form-data">
+                    @* Title *@
+                    <div class="form-group">
+                        <label asp-for="Title" class="control-label"></label>
+                        <input asp-for="Title" id="title" class="form-control" placeholder="Enter movie title" />
+                        <span asp-validation-for="Title" class="text-danger" id="movieTitleError"></span>
+                    </div>
+
+                    @* Description *@
+                    <div class="form-group">
+                        <label asp-for="Description" class="control-label"></label>
+                        <textarea asp-for="Description" class="form-control" placeholder="Enter description"></textarea>
+                        <span asp-validation-for="Description" class="text-danger"></span>
+                    </div>
+
+                    @* Categories *@
+                    <div class="form-group">
+                        <label asp-for="CategoriesIds" class="control-label">Category</label>
+                        <select asp-for="CategoriesIds" class="js-select2 form-control" multiple="multiple"
+                            asp-items="@ViewBag.CategoryList">
+                        </select>
+                        <span asp-validation-for="Categories" class="text-danger"></span>
+                    </div>
+
+                    @* Directors *@
+                    <div class="form-group">
+                        <label asp-for="DirectorIds" class="control-label">Director</label>
+                        <select asp-for="DirectorIds" class="js-select2 form-control" multiple="multiple"
+                            asp-items="@ViewBag.DirectorList">
+                        </select>
+                        <span asp-validation-for="Actors" class="text-danger"></span>
+                    </div>
+
+                    @* Actors *@
+                    <div class="form-group">
+                        <label asp-for="ActorIds" class="control-label">Actors</label>
+                        <select asp-for="ActorIds" class="js-select2 form-control" multiple="multiple"
+                            asp-items="@ViewBag.ActorList">
+                        </select>
+                        <span asp-validation-for="Actors" class="text-danger"></span>
+                    </div>
+
+                    @* Image *@
+                    <div class="form-group">
+                        <label asp-for="FileUploads" class="control-label"></label>
+                        <input type="file" class="form-control" accept="image/*" name="FileUploads" id="fileUpload"
+                            multiple />
+                        <span asp-validation-for="FileUploads" class="text-danger"></span>
+                    </div>
+
+                    @* Image Preview *@
+                    <div class="form-group">
+                        <label>Image Preview</label>
+                        <div id="imagePreviews" style="display: flex; gap: 10px; flex-wrap: wrap;"></div>
+                    </div>
+
+                    @* Series (Type) *@
+                    <div class="form-group">
+                        <label asp-for="Series" class="control-label">Type</label>
+                        <div class="form-check">
+                            <input asp-for="Series" class="form-check-input" type="checkbox" id="series_movie" />
+                            <label class="form-check-label" for="series_movie">Is TV series</label>
+                        </div>
+                    </div>
+
+                    @* Trailer Link *@
+                    <div class="form-group">
+                        <label asp-for="TrailerUpload" class="control-label"></label>
+                        <input asp-for="TrailerUpload" class="form-control" type="file" accept="video/*" />
+                        <span asp-validation-for="TrailerUpload" class="text-danger"></span>
+                    </div>
+
+                    @* Release Date *@
+                    <div class="form-group">
+                        <label asp-for="ReleaseDate" class="control-label"></label>
+                        <input asp-for="ReleaseDate" class="form-control" type="date" />
+                        <span asp-validation-for="ReleaseDate" class="text-danger"></span>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button class="btn btn-primary" onclick="CheckExitMovie()" type="button">Add</button>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    function CheckExitMovie() {
+        var title = $("#title").val().trim();
+
+        if (title) {
+            $.ajax({
+                url: '@Url.Action("CheckMovieExists", "Movie")',
+                type: 'GET',
+                data: { title: title },
+                success: function (response) {
+                    if (response) {
+                        $('#movieTitleError').text('Title has already existed.');
+                    } else {
+                        $('#movieTitleError').text('');
+                        $("#addMovieForm").submit();
+                    }
+                },
+                error: function () {
+                    console.log("An error occurred while checking movie title.");
+                }
+            });
+        } else {
+            $('#movieTitleError').text('Title is required.');
+        }
+    }
+
+    $(document).ready(function () {
+        // Initialize select2 when addMovie modal is shown
+        $('#addMovie').on('shown.bs.modal', function () {
+            $('.js-select2').select2({
+                width: '100%'
+            });
+        });
+
+        // Handle image file input change to show multiple previews
+        $('#fileUpload').on('change', function (event) {
+            var files = event.target.files;
+            $('#imagePreviews').empty(); // Clear existing previews
+
+            $.each(files, function (index, file) {
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    var dataURL = e.target.result;
+                    var imageContainer = $('<div>').addClass('image-container position-relative m-2');
+                    var img = $('<div>')
+                        .addClass('image-preview')
+                        .css({
+                            'background-image': 'url(' + dataURL + ')',
+                            'background-size': 'cover',
+                            'background-position': 'center',
+                            'width': '150px',
+                            'height': '150px'
+                        });
+
+                    // Add remove button to each image preview
+                    var removeButton = $('<button>')
+                        .addClass('btn btn-danger btn-sm position-absolute')
+                        .css({ 'top': '5px', 'right': '5px' })
+                        .text('X')
+                        .on('click', function () {
+                            var fileInput = $('#fileUpload')[0];
+                            var newFileList = Array.from(fileInput.files).filter(f => f !== file);
+                            var dataTransfer = new DataTransfer();
+                            newFileList.forEach(f => dataTransfer.items.add(f));
+                            fileInput.files = dataTransfer.files;
+
+                            $(this).closest('.image-container').remove();
+                        });
+
+                    imageContainer.append(img).append(removeButton);
+                    $('#imagePreviews').append(imageContainer);
+                };
+                reader.readAsDataURL(file);
+            });
+        });
+    });
+</script>

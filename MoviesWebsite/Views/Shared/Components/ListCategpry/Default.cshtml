@@ -1,0 +1,17 @@
+﻿@model IEnumerable<MoviesWebsite.Models.Movie.Category>
+<div>
+    @{
+        foreach(var item in Model)
+        {
+            <li>
+                <a class="btn btn-default"
+                   asp-area=""
+                   asp-controller="ViewMovies"
+                   asp-action="index"
+                   asp-route-categories="@item.CategoryId">
+                    @item.Title
+                </a>
+            </li>
+        }
+    }
+</div>

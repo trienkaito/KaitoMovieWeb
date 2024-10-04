@@ -1,0 +1,17 @@
+﻿@model List<MoviesWebsite.Models.Movie.Actor>
+
+@foreach (var actor in Model)
+{
+    <div class="celeb-item">
+        <a onclick="window.location.href='@Url.Action("Details", "HomeActor", new { id = actor.ActorId })';">
+            <img src="@actor.Image"
+                 alt=""
+                 width="70"
+                 height="70" />
+        </a>
+        <div class="celeb-author">
+            <h6><a onclick="window.location.href='@Url.Action("Details", "HomeActor", new { id = actor.ActorId })';">@actor.Name</a></h6>
+            <span>@actor.Role</span>
+        </div>
+    </div>
+}

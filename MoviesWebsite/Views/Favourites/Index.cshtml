@@ -1,0 +1,131 @@
+﻿@using static MoviesWebsite.Controllers.ViewMoviesController
+@model ViewCategory
+
+@{
+	ViewData["Title"] = "Favourite";
+	Layout = "~/Views/Shared/_Layout.cshtml";
+	var sortBy = ViewData["SortBy"] as SelectList;
+	var moviesPerPages = ViewData["MoviesPerPages"] as SelectList;
+	var view = ViewData["View"] as string;
+}
+
+<div class="page-single">
+	<div class="container" style="padding: 0 !important;">
+		<div class="row ipad-width">
+			<div class="col-md-8 col-sm-12 col-xs-12">
+				<div class="topbar-filter">
+					<p>Found <span>@Model.Movies.Count movies</span> in total</p>
+					<label asp-for="SortBy"></label>
+					<select asp-for="SortBy" id="select-sort-by" asp-items="@sortBy">
+					</select>
+					@if (string.IsNullOrWhiteSpace(view) || view == "grid")
+					{
+						<a id="view-list" href="#" class="list"><i class="ion-ios-list-outline "></i></a>
+						<a id="view-grid" href="#" class="grid"><i class="ion-grid active"></i></a>
+					}
+					else if (view == "list")
+					{
+						<a id="view-list" href="#" class="list"><i class="ion-ios-list-outline active"></i></a>
+						<a id="view-grid" href="#" class="grid"><i class="ion-grid "></i></a>
+					}
+				</div>
+
+				@if (string.IsNullOrWhiteSpace(view) || view == "grid")
+				{
+					<partial name="_GridMovies" model="@Model" />
+				}
+				else if (view == "list")
+				{
+					<partial name="_ListMovies" model="@Model" />
+				}
+
+				<div class="topbar-filter">
+					<label asp-for="PageSize"></label>
+					<select asp-for="PageSize" id="select-page-size" asp-items="@moviesPerPages">
+					</select>
+					<partial name="_PagingXTLClient" model="@ViewBag.pagingmodel" />
+				</div>
+			</div>
+			<div class="col-md-4 col-sm-12 col-xs-12">
+				<div class="sidebar">
+					<div class="search-form">
+						<h4 class="sb-title">Filter for movie</h4>
+						<form class="form-style-1" id="form-filter" method="get" asp-action="Index">
+							<partial name="_Filter" model="@Model" />
+						</form>
+					</div>
+
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+@section Scripts {
+	<script>
+
+
+		$("document").ready(function () {
+			console.log("Ready");
+			FormYearChange();
+			$("#select-from-year").change(FormYearChange);
+			$("#select-page-size").change(PageSizeChange);
+			$("#select-sort-by").change(SortByChange);
+			$("#view-list").click(ViewList);
+			$("#view-grid").click(ViewGrid);
+		});
+
+
+		function SubmitForm() {
+			$("#form-filter").submit();
+		}
+
+		function PageSizeChange() {
+			$("#page-size").val($("#select-page-size").val());
+			SubmitForm();
+		}
+
+		function SortByChange() {
+			$("#sort-by-form").val($("#select-sort-by").val());
+			SubmitForm();
+		}
+
+		function ViewList() {
+			$("#view-form").val("list");
+			SubmitForm();
+		}
+
+		function ViewGrid() {
+			$("#view-form").val("grid");
+			SubmitForm();
+		}
+
+		function FormYearChange() {
+			console.log("Get to year");
+			if ($("#select-from-year").val()) {
+				$.ajax({
+					url: '@Url.Action("GetToYear", "Favourites")',
+					method: 'POST',
+					data: {
+						fromYear: $("#select-from-year").val(),
+						toYear: $("#select-to-year").val(),
+					},
+					success: function (response) {
+						console.log(response);
+						$("#to-year").html(response);
+						$("#select-to-year").prop("disabled", false);
+					},
+					error: function (xhr, status, error) {
+						console.error('Error:', status, error);
+					}
+				});
+			}
+			else {
+				console.log("from year hasn't value");
+				$("#select-to-year").prop("disabled", true);
+				$("#select-to-year").val("");
+			}
+		}
+
+	</script>
+}

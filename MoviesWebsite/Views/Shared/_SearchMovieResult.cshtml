@@ -1,0 +1,21 @@
+﻿@model IEnumerable<MoviesWebsite.Models.Movie.Movie>
+
+@foreach (var item in Model)
+{
+
+	<a class="search-item" asp-area="" asp-controller="Home" asp-action="Detail" asp-route-slug="@item.Slug">
+		@if (!string.IsNullOrWhiteSpace(item.Image))
+		{
+			<img class="search-img" src="@item.Image" alt="">
+		}
+		else
+		{
+			<img src="/Uploads/nophoto.png" alt="">
+		}
+		<div class="mv-item-infor">
+			<h6>
+				@item.Title
+			</h6>
+		</div>
+	</a>
+}

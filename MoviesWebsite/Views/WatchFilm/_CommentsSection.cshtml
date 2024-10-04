@@ -1,0 +1,240 @@
+﻿@* @model int // MovieId *@
+@model MoviesWebsite.Models.Movie.Movie
+@using Microsoft.AspNetCore.Identity
+@inject UserManager<AppUser> UserManager
+
+<style>
+    .comment-input-section {
+        margin: 0 auto 20px;
+        padding: 20px;
+        background-color: #f8f9fa;
+        border-radius: 10px;
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .comment-input-section h5 {
+        margin-bottom: 15px;
+        font-size: 1.8rem;
+        color: #343a40;
+    }
+
+    /* Styling for the textarea */
+    .comment-input-section textarea {
+        using Microsoft.AspNetCore.Identity;
+        resize: none;
+        font-size: 1.8rem;
+        border-radius: 6px;
+    }
+
+    .styled-button {
+        background-color: #dd003f;
+        border: none;
+        color: white;
+        padding: 15px 32px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        margin: 4px 2px;
+        cursor: pointer;
+        border-radius: 8px;
+        transition: background-color 0.3s;
+    }
+
+    .styled-button:hover {
+        background-color: #45a049;
+        /* Màu nền khi hover */
+    }
+
+    /* Styling for multiple comments section */
+    .comments-section {
+        margin: 0 auto;
+        /* Center the comments */
+    @*padding:20px;*@@*background-color:#f8f9fa;*@@*border-radius:10px;*@@*box-shadow:0px4px8pxrgba(0,0,0,0.1);*@
+    }
+
+    /* Each comment styling */
+    .mv-user-review-item {
+        border: 1px solid #e0e0e0;
+        border-radius: 10px;
+        padding: 15px;
+        margin-bottom: 15px;
+        /* Add space between comments */
+        background-color: #ffffff;
+    }
+
+    /* Avatar styling */
+    .user-avatar img {
+        width: 80px;
+        /* Adjust avatar size */
+        height: 80px;
+        object-fit: cover;
+    }
+
+    /* Text and link styling */
+    .user-infor .time {
+        font-size: 1.8rem;
+        color: #6c757d;
+    }
+
+    .user-infor .review-text {
+        font-size: 2.1rem;
+    }
+
+    .user-infor a {
+        color: #007bff;
+        text-decoration: none;
+    }
+
+    .user-infor a:hover {
+        text-decoration: underline;
+    }
+
+    /* Adjust spacing between elements */
+    .mv-user-review-item .user-infor {
+        flex-grow: 1;
+    }
+
+    /* Comment section shadow */
+    .comments-section {
+    @*background-color:#f5f5f5;*@@*padding:20px;*@@*box-shadow:0015pxrgba(0,0,0,0.05);*@@*border-radius:10px;*@
+    }
+
+    .load-more-btn {
+        background-color: #007bff;
+        border: none;
+        color: white;
+        padding: 15px 32px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        margin: 4px 2px;
+        cursor: pointer;
+        border-radius: 8px;
+        transition: background-color 0.3s;
+    }
+</style>
+<div class="movie-tabs">
+    <div class="tabs">
+        <div class="tab-content">
+            <div class="tab active">
+                <div class="row">
+                    <div class="topbar-filter">
+                        <p>Found <span id="commentCount"></span> comments in total</p>
+                        <label>Filter by:</label>
+                        <select id="sortComments">
+                            <option value="date">Date Ascending</option>
+                            <option value="date">Date Descending</option>
+                        </select>
+                    </div>
+                    <div class="comment-input-section mb-4">
+                        <h5>Leave a Comment</h5>
+                        <form id="commentForm">
+                            <div class="mb-3">
+                                <textarea class="form-control" id="commentText" rows="3"
+                                    placeholder="Write your comment..."></textarea>
+                            </div>
+                            <button type="submit" class="styled-button">Post Comment</button>
+                        </form>
+                    </div>
+
+                    <div id="commentsList">
+                    </div>
+
+
+
+                    @* <div class="topbar-filter" id="loadMoreComments">
+                    <button data-skip="2" id="loadMoreBtn" onclick="loadMoreComments(@Model.MovieId)"
+                    class="load-more-btn">Load more
+                    comments</button>
+
+                    </div> *@
+                    <div>
+                        <button id="loadMoreBtn" data-skip="2" class="load-more-btn" style="width:100%"
+                            onclick="loadMoreComments(@Model.MovieId)">Load 2 more comments</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+
+    $(document).ready(function () {
+        var a = $('#commentsList').children().length;
+        a += 2;
+        if (a >= @Model.Comments.Count) {
+            $('#loadMoreBtn').hide();
+        }
+    });
+
+    $(document).ready(function () {
+        $.ajax({
+            url: '@Url.Action("ListComments", "Comments")',
+            type: 'GET',
+            data: { movieId: @Model.MovieId },
+            success: function (data) {
+                $('#commentsList').html(data);
+            }
+        });
+    });
+
+    $('#commentForm').submit(function (e) {
+        e.preventDefault();
+        var content = $('#commentText').val();
+        if (content.trim() === '') {
+            alert("Comment cannot be empty");
+            return;
+        }
+
+        $.post('/comments/create', { movieId: @Model.MovieId, content: content }, function (result) {
+            if (result.success) {
+                $('#commentText').val('');
+                $.ajax({
+                    url: '@Url.Action("ListComments", "Comments")',
+                    type: 'GET',
+                    data: { movieId: @Model.MovieId },
+                    success: function (data) {
+                        $('#commentsList').html(data);
+                    }
+                });
+            } else {
+                alert(result.message);
+            }
+        });
+    });
+
+    @* var skipCount = 2; *@
+
+
+        function loadMoreComments(movieId) {
+            var skipCount = $('#loadMoreBtn').data('skip');
+            var a = $('#commentsList').children().length;
+            a++;
+            console.log(a, "abc");
+            $.ajax({
+                url: '@Url.Action("LoadMore", "Comments")',
+                type: 'GET',
+                data: { movieId: movieId, skip: skipCount },
+                success: function (data) {
+                    $('#commentsList').append(data);
+                    a = a + skipCount;
+                    skipCount += 2;
+                    $('#loadMoreBtn').attr('data-skip', skipCount);
+                    $('#loadMoreBtn').data('skip', skipCount);
+                    //console.log(a, "abc");
+
+                    console.log(a, " a after");
+                    console.log(@Model.Comments.Count, "test");
+
+                    if (a >= @Model.Comments.Count) {
+                        $('#loadMoreBtn').hide();
+                    }
+                }
+            });
+        }
+
+</script>

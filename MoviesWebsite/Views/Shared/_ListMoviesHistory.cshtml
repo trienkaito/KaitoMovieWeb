@@ -1,0 +1,73 @@
+﻿@using static MoviesWebsite.Controllers.HistoriesController
+@model ViewHistory
+
+<style>
+    .img-movie {
+        height: 255px;
+        width: 170px;
+        object-fit:cover;
+    }
+</style>
+
+@foreach (var item in Model.Histories)
+{
+    <div class="movie-item-style-2">
+        @if (!string.IsNullOrWhiteSpace(item.Episode.Movie.Image))
+        {
+            <img class="img-movie" src="@item.Episode.Movie.Image" alt="">
+        }
+        else
+        {
+            <img class="img-movie" src="/Uploads/nophoto.png" alt="">
+        }
+        <div class="mv-item-infor">
+            <h6>
+                <form asp-action="ChangeEpisode" asp-area="" asp-controller="WatchFilm" method="post">
+                    <input type="hidden" name="slug" value="@item.Episode.Slug" />
+                    <a onclick="RedirectEpisode(this)">
+                        <h6>
+                            @item.Episode.Movie.Title @{
+                                if (item.Episode.Movie.ReleaseDate != null)
+                                {
+                                    <span>(@item.Episode.Movie.ReleaseDate?.Year)</span>
+                                }
+                            }
+
+                        </h6>
+                        <h6>
+                            @item.Episode.Title
+                        </h6>
+                    </a>
+                </form>
+            </h6>
+
+            @{
+
+                // if (item.Episode.Movie.Description != null)
+                // {
+                //     int lenght = 150;
+                //     if (item.Episode.Movie.Description.Length > lenght)
+                //     {
+                //         <p class="describe">
+                //             @(item.Episode.Movie.Description.Substring(0, lenght) + "...")
+                //         </p>
+                //     }
+                //     else
+                //     {
+                //         <p class="describe">
+                //             @item.Episode.Movie.Description
+                //         </p>
+                //     }
+                // }
+                if (item.Episode.Movie.ReleaseDate != null)
+                {
+                    <p class="run-time">Release: @item.Episode.Movie.ReleaseDate?.ToShortDateString()</p>
+                }
+                <p class="run-time">Time: @item.Time?.ToShortTimeString()</p>
+                <p class="run-time">Date: @item.Time?.ToShortDateString()</p>
+            }
+
+        </div>
+    </div>
+}
+

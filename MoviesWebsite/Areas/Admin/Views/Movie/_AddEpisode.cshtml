@@ -1,0 +1,36 @@
+﻿@model MoviesWebsite.Areas.Admin.Models.EpisodeAdd
+
+<div class="modal fade" id="addEpisodeModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Add Episode</h5>
+                <button class="close" type="button" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form asp-action="AddEpisode" method="post" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label asp-for="Title">Episode Title</label>
+                        <input asp-for="Title" class="form-control" />
+                        <span asp-validation-for="Title" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Link">Link</label>
+                        <input asp-for="Link" class="form-control" type="file" accept="video/*" />
+                        <span asp-validation-for="Link" class="text-danger"></span>
+                    </div>
+
+
+                    <!-- Hidden input for MovieId -->
+                    <input type="hidden" asp-for="MovieId" />
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary" onclick="submitEditEpisode()">Submit</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

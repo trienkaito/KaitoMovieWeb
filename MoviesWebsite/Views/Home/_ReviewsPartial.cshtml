@@ -1,0 +1,51 @@
+﻿@using System.Security.Claims
+@model IEnumerable<MoviesWebsite.Models.Movie.Evaluate>
+
+@foreach (var review in Model)
+{
+    var rating = Model.FirstOrDefault(e => e.UserId == review.UserId)?.Star ?? 0;
+    <div class="user-infor" style="display: flex; align-items: center; gap: 10px;">
+        @if (!string.IsNullOrEmpty(review.User?.Avatar))
+        {
+            <img src="@review.User?.Avatar" width="50px" height="50px" style="object-fit: cover;" alt="">
+        }
+        else
+        {
+            <img src="/contents/avata.jpg" width="50px" height="50px" style="object-fit: cover;" alt="" />
+        }
+
+        <div style="padding-top: 10px; max-width: 200px;">
+            <p style="font-size: 16px;">@review.Content</p>
+            <div class="no-star">
+                @for (int i = 1; i <= review.Star; i++)
+                {
+                    <i class="ion-android-star"></i>
+                }
+                @if (review.User != null)
+                {
+                    for (int i = review.Star + 1; i <= 10; i++)
+                    {
+                        <i class="ion-android-star-outline"></i>
+                    }
+                }
+                else
+                {
+                    // Nếu `User` là null, có thể hiển thị thông báo thay thế hoặc bỏ qua
+                    <i>No user information available</i>
+                }
+            </div>
+            <p class="time">
+                @review.CreatedDate?.ToString("dd MMMM yyyy") by <a asp-area="Identity" asp-controller="Manage" asp-action="Index">@review.User.UserName</a>
+                @if (User.Identity.IsAuthenticated && User.FindFirstValue(ClaimTypes.NameIdentifier) == review.UserId)
+                {
+                    <button onclick="DeleteReview(this)" type="button" class="delete-review-btn"
+                            style="color: #FF0000; background-color: transparent; border: none; margin-left: 10px;"
+                            data-evaluate-id="@review.EvaluateId"
+                            data-movie-id="@review.MovieId">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                }
+            </p>
+        </div>
+    </div>
+}

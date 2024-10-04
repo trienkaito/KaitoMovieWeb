@@ -1,0 +1,234 @@
+﻿@model EditExtraProfileModel
+<style>
+    .layout {
+        display: flex;
+        flex-wrap: nowrap;
+        padding: 20px;
+    }
+
+    .sidebar {
+        height: 100%;
+        background-color: #343a40;
+        padding: 30px;
+        width: 250px;
+        color: white;
+        margin-right: 30px;
+    }
+
+    .sidebar h4 {
+        color: white;
+    }
+
+    .sidebar .nav-link {
+        color: white;
+        padding: 10px 0;
+    }
+
+    .sidebar .nav-link:hover {
+        background-color: #495057;
+        border-radius: 5px;
+    }
+
+    .dropdown-menu {
+        background-color: #495057;
+    }
+
+    .dropdown-item {
+        color: white;
+    }
+
+    .dropdown-item:hover {
+        background-color: #6c757d;
+    }
+
+    .main-content {
+        flex-grow: 1;
+    }
+
+    .profile-container {
+        background-color: #233a50;
+        border-radius: 15px;
+        padding: 30px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .profile-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .profile-header img {
+        border-radius: 50%;
+        width: 80px;
+        height: 80px;
+        object-fit: cover;
+    }
+
+    .profile-header h5 {
+        margin: 0;
+        font-size: 1.2rem;
+    }
+
+    .profile-header p {
+        margin: 0;
+        color: #6c757d;
+    }
+
+    .profile-edit-btn {
+        background-color: #007bff;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-label {
+        font-weight: bold;
+        color: white;
+        display: block;
+    }
+
+    .form-value {
+        background-color: #f1f1f1;
+        padding: 10px;
+        border-radius: 5px;
+        display: block;
+        font-size: 2rem;
+        color: #495057;
+    }
+
+    .email-info {
+        margin-top: 30px;
+    }
+
+    .email-info i {
+        color: #007bff;
+    }
+
+    .add-email-btn {
+        background-color: #e1e9fc;
+        color: #007bff;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        margin-top: 10px;
+    }
+
+    .profile-container1 {
+        max-width: 500px;
+        margin: 50px auto;
+        background-color: #f8f9fa;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .profile-avatar {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .profile-avatar img {
+        border-radius: 50%;
+        width: 150px;
+        height: 150px;
+        object-fit: cover;
+        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .form-group label {
+        font-weight: bold;
+    }
+
+    .btn-save {
+        cursor: pointer;
+        color: white;
+        font-size: 1.5em;
+        margin-top: 10px;
+        margin: 0 auto;
+        display: block;
+        border: none;
+        background-color: transparent;
+        text-align: center;
+        transition: all 0.3s ease-in-out;
+        font-weight: 500;
+        background-color: #007bff;
+        border: 1px solid #007bff;
+        padding: 5px 10px;
+        border-radius: 5px;
+    }
+</style>
+<partial name="_StatusMessage" />
+
+
+<div class="test">
+    <div class="profile-container1">
+
+        <div class="profile-avatar">
+            @if (!string.IsNullOrWhiteSpace(Model.Avatar))
+            {
+                <img id="previewImageEdit" src="@Model.Avatar" alt="Image Preview" width="200px" height="auto" />
+            }
+            else
+            {
+                <img id="previewImageEdit" src="/contents/avata.jpg" alt="Image Preview" width="200px" height="auto" />
+            }
+        </div>
+        <form id="profile-form" method="post" enctype="multipart/form-data">
+            <div class="form-group">
+                <label asp-for="Image">Avatar</label>
+                <input asp-for="Image" id="fileUploadEdit" class="form-control" />
+            </div>
+
+            <div class="form-group">
+                <label asp-for="UserName"></label>
+                <input asp-for="UserName" class="form-control" disabled />
+            </div>
+
+            <div class="form-group">
+                <label asp-for="UserEmail"></label>
+                <input asp-for="UserEmail" class="form-control" disabled />
+            </div>
+
+
+
+            <div class="form-group">
+                <label asp-for="BirthDate"></label>
+                <input asp-for="BirthDate" max="@DateTime.Now.ToString("yyyy-MM-dd")" class="form-control" />
+                <span asp-validation-for="BirthDate" class="text-danger"></span>
+            </div>
+            <button type="submit" class="btn-save">Save</button>
+        </form>
+    </div>
+</div>
+
+
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        $(document).ready(function () {
+            // Handle image file input change to show preview
+            $('#fileUploadEdit').on('change', function (event) {
+                var input = event.target;
+                var reader = new FileReader();
+
+                reader.onload = function (e) {
+                    $('#previewImageEdit').attr('src', e.target.result);
+                };
+
+                if (input.files && input.files[0]) {
+                    reader.readAsDataURL(input.files[0]);
+                }
+            });
+
+        });
+
+    </script>
+}

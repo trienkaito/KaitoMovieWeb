@@ -1,0 +1,30 @@
+﻿@{
+    ViewData["Title"] = "Lock account";
+    var time = ViewData["LockTime"] as DateTimeOffset?;
+}
+
+<header>
+    <h1 class="text-danger" style="color:crimson">@ViewData["Title"]</h1>
+    @if(time == null)
+    {
+        <p class="text-danger">
+            Your account has been temporarily locked, please try again later.
+        </p>
+    }
+    else
+    {
+        if (time?.Date == DateTimeOffset.Now.Date)
+        {
+            var countdown = time - DateTimeOffset.Now;
+            <p class="text-danger">
+                Your account has been temporarily locked, please try again in @countdown.Value.Minutes minutes @countdown.Value.Seconds seconds.
+            </p>
+        }
+        else 
+        {
+            <p class="text-danger">
+                Your account has been locked, please try again on @time.Value.DateTime.
+            </p>
+        }
+    }
+</header>

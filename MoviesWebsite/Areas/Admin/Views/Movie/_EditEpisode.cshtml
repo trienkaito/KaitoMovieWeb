@@ -1,0 +1,160 @@
+﻿@model MoviesWebsite.Areas.Admin.Models.EpisodeAdd
+
+<div class="modal fade" id="editEpisodeModal" tabindex="-1" aria-labelledby="editEpisodeModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editEpisodeModalLabel">Edit Episode</h5>
+                <button class="close" type="button" data-bs-dismiss="modal" onclick="closeModal()" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="editEpisodeForm" asp-controller="Movie" asp-action="EditEpisode" method="post">
+                    <div class="form-group">
+                        <label for="Title">Episode Title</label>
+                        <input type="text" class="form-control" asp-for="Title" id="Title" name="Title" />
+                       
+
+                        <input type="hidden" asp-for="EpisodeId" name="EpisodeId" id="EpisodeId" />
+                        <input type="hidden" asp-for="Slug" name="Slug" />
+                        <input type="hidden" asp-for="MovieId" name="MovieId" />
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Link">Upload Link</label>
+                        <input type="file" asp-for="Link" class="form-control" id="Link" name="Link" />
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeModal()" data-bs-dismiss="modal">Close</button>
+                <button type="submit" class="btn btn-primary" onclick="submitEditEpisode()">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+
+<script>
+
+    $("#editEpisodeForm").validate({
+        rules: {
+            Title: {
+                required: true
+            },
+            Link: {
+                required: true
+            }
+        },
+        messages: {
+            Title: {
+                required: "Please enter episode title"
+            },
+            Link: {
+                required: "Please enter episode link"
+            }
+        },
+        errorClass: "text-danger",
+        validClass: "text-success",
+        errorElement: "span"
+    });
+
+    function checkFilterExist(episodeId, title, existCallback, notExistCallback) {
+        $.ajax({
+            url: '@Url.Action("IsFilterExist", "Movie")',
+            type: 'GET',
+            data: {
+                Title: title,
+                EpisodeId: episodeId // Thêm EpisodeId vào đây
+            },
+            success: function (data) {
+                if (data) {
+                    existCallback();  // Title exists
+                    console.log("Title exists:", title);
+                } else {
+                    notExistCallback();
+                    console.log("Title:", title); // Title doesn't exist
+                }
+            },
+            error: function (xhr) {
+                console.log(xhr.responseText);
+            }
+        });
+        console.log("Title:", title);
+    }
+
+    function handleExist() {
+        if (document.getElementById('titleExistError') )
+        {
+            console.log(typeof (document.getElementById('titleExistError')));
+            document.getElementById('titleExistError').remove();
+        }
+        document.querySelector('#editEpisodeModal input[name="Title"]').insertAdjacentHTML('afterend', '<span id="titleExistError" class="text-danger">Episode with this title already exists.</span>');
+    }
+
+    function handleNotExist() {
+        var existingError = document.getElementById('titleExistError');
+
+        if (existingError) {
+            existingError.remove();
+        }
+
+        var title = document.querySelector('#editEpisodeModal input[name="Title"]').value.trim();
+
+        if (title.length < 2) {
+            console.log("Length", title.length);
+            document.querySelector('#editEpisodeModal input[name="Title"]').insertAdjacentHTML('afterend', '<span id="titleExistError" class="text-danger">Episode title must be more than 2 characters.</span>');
+        } else {
+            // Tiếp tục gửi form nếu tiêu đề hợp lệ
+            var form = $('#editEpisodeForm');
+            if (form.valid()) {
+                submitForm(form);
+            }
+        }
+    }
+
+    function submitEditEpisode() {
+        var form = $('#editEpisodeForm');
+        var title = document.querySelector('#editEpisodeModal input[name="Title"]').value;
+        var episodeId = document.getElementById('EpisodeId').value;
+        checkFilterExist(episodeId, title, handleExist, handleNotExist);
+        console.log(episodeId);
+    }
+
+    function submitForm() {
+        var form = $('#editEpisodeForm')[0]; // Lấy đối tượng DOM thực tế
+        var formData = new FormData(form); // Tạo đối tượng FormData để gửi tệp
+
+        $.ajax({
+            url: $(form).attr('action'),
+            type: 'POST',
+            data: formData,
+            contentType: false, // Tắt contentType mặc định
+            processData: false, // Tắt xử lý dữ liệu mặc định
+            success: function (response) {
+                if (response.success) {
+                    var editModal = bootstrap.Modal.getInstance(document.getElementById('editEpisodeModal'));
+                    editModal.hide();
+                    location.reload();
+                } else {
+                    // Xử lý lỗi khác ở đây nếu cần thiết
+                }
+            },
+            error: function () {
+                console.log('An error occurred while saving the episode.');
+            }
+        });
+    }
+
+
+    $('#editEpisodeModal').on('hide.bs.modal', function () {
+        var form = $("#editEpisodeForm");
+        form.validate().resetForm();
+        form[0].reset();
+        $('#titleExistError').remove();
+    });
+
+
+   
+</script>

@@ -1,0 +1,83 @@
+﻿@model MoviesWebsite.Models.Movie.ActorViewModel
+
+<div class="modal fade" id="addActor" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content" style="width: 700px">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Actor</h5>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form method="post" asp-controller="Actor" asp-area="Admin" asp-action="Create" id="addActorForm" enctype="multipart/form-data">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                    <div class="form-group">
+                        <label asp-for="Actor.Name" class="control-label"></label>
+                        <input asp-for="Actor.Name" id="name" class="form-control" placeholder="Enter actor name" />
+                        <span asp-validation-for="Actor.Name" class="text-danger" id="actorNameError"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="Actor.Role" class="control-label"></label>
+                        <select asp-for="Actor.Role" id="actorRole" class="form-control" asp-items="@Model.Roles" class="form-select">
+                            <option value="" disabled onselect="">-- Select Role --</option>
+                        </select>
+                        <span asp-validation-for="Actor.Role" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="Actor.Image" class="control-label"></label>
+                        <input asp-for="Actor.Image" class="form-control" id="image" name="files" type="file" />
+                        <span asp-validation-for="Actor.Image" class="text-danger"></span>
+                    </div>
+
+                    <!-- Display the selected image -->
+                    <div class="form-group">
+                        <img id="selectedImagePreview" src="#" alt="Selected Image" style="display:none; max-width:25%; height:auto; margin-top:10px;" />
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button class="btn btn-primary" onclick="CheckExitActor()" type="button">Add</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<partial name="_ValidationScriptsPartial" />
+
+<script src="~/js/previewImg.js"></script>
+
+<script>
+    function CheckExitActor() {
+        var name = $("#name").val().trim();
+        var role = $('#actorRole').val();
+
+        console.log(role)
+
+        if (name && role) {
+            $.ajax({
+                url: '@Url.Action("IsActorExists", "Actor")',
+                type: 'GET',
+                data: { name: name, role: role },
+                success: function (response) {
+                    if (response) {
+                        $('#actorNameError').text('Actor already exists in the system. Please try again!');
+                    } else {
+                        $('#actorNameError').text('');
+                        $('#addActorForm').submit();
+                    }
+                },
+                error: function () {
+                    console.log("An error occurred while checking actor name.");
+                }
+            });
+        } else {
+            $('#actorNameError').text('Name is required.');
+        }
+    }
+</script>

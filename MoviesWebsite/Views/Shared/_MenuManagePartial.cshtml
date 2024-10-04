@@ -1,0 +1,23 @@
+@using Microsoft.AspNetCore.Authorization
+@inject IAuthorizationService authorization
+@using Microsoft.AspNetCore.Authorization
+@inject IAuthorizationService authorization
+
+<style>
+    .adminMenu {
+        color: #abb7c4;
+    }
+
+        .adminMenu:hover {
+            color: #dcf836 !important;
+        }
+</style>
+@{
+    var result = await authorization.AuthorizeAsync(this.User, "ViewManageMenu");
+}
+@if (result.Succeeded)
+{
+    <a class="nav-link text-info adminMenu" asp-action="Index" asp-controller="Dashboard" asp-area="Admin">
+        <i class="fas fa-cog"></i> Administration
+    </a>
+}

@@ -1,0 +1,702 @@
+@using MoviesWebsite.Data
+@model MoviesWebsite.Models.Movie.MovieDetaisViewModel
+
+@* @model MoviesWebsite.Models.Movie.Movie
+ *@
+@{
+    ViewData["Title"] = "Detail";
+}
+
+<style>
+ .styled-video {
+  width: 100%;
+  max-width: 1000px; /* Set a maximum width for the video */
+  border-radius: 10px;
+  box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.5); /* Add shadow */
+}
+</style>
+
+<div class="hero mv-single-hero">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <!-- <h1> movie listing - list</h1>
+                <ul class="breadcumb">
+                    <li class="active"><a href="#">Home</a></li>
+                    <li> <span class="ion-ios-arrow-right"></span> movie listing</li>
+                </ul> -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document"> <!-- Added modal-lg for larger modal -->
+    <div class="modal-content" style="background-color: black;">
+     <div class="modal-body">
+         @* <iframe id="trailer" width="100%" height="500" 
+         class="suben"
+              src="@Model.Movie.Trailer"
+              frameborder="0" allowfullscreen>
+      </iframe> *@
+      <video controls width="100%" class="styled-video">
+  <source src="https://res.cloudinary.com/ddemtqw8t/video/upload/v1725954348/fhm8bxqou97os8mo2bcm.mp4" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
+     </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="page-single movie-single movie_single">
+    <div class="container">
+        <div class="row ipad-width2">
+            <div class="col-md-4 col-sm-12 col-xs-12">
+                <div class="movie-img sticky-sb">
+                    <img src="@Model.Movie.Image" alt="">
+                    <div class="movie-btn">
+                        <div class="" style="margin-bottom: 10px;cursor: pointer;">
+                            <div>
+                                @* <button
+                                type="button"
+                                data-bs-toggle="modal" data-bs-target="#exampleModal"
+                                onclick="openTrailer('@Model.Movie.Trailer')"
+                                   class="item item-1 yellowbtn">
+                                    <i class="ion-play"></i> Watch Trailer
+                                </button> *@
+                     <a type="button" class="item item-1 yellowbtn" data-toggle="modal" data-target="#exampleModal">
+                        <i class="ion-play"></i> Watch Trailer
+                    </a>
+                            </div>
+                     
+                            @* <div>
+                                <a
+                                   class="item item-2 yellowbtn fancybox-media hvr-grow">
+                                    <i class="ion-play"></i>
+                                </a>
+                            </div> *@
+                        </div>
+
+                        @if (Model.Movie.Episodes != null && Model.Movie.Episodes.Any())
+                        {
+                            <!-- Có tập phim -->
+                            <div class="btn-transform transform-vertical">
+                                <div>
+                                    <a asp-area="" asp-controller="WatchFilm" asp-action="Index" asp-route-slug="@Model.Movie.Episodes.FirstOrDefault().Slug"
+                                       class="item item-1 redbtn">
+                                        <i class="ion-play"></i> Watch film
+                                    </a>
+                                </div>
+                                <div>
+                                    <a asp-area="" asp-controller="WatchFilm" asp-action="Index" asp-route-slug="@Model.Movie.Episodes.FirstOrDefault().Slug"
+                                       class="item item-2 redbtn">
+                                        <i class="ion-play"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        }
+                        else
+                        {
+                            <!-- Không có tập phim -->
+                            <div class="btn-transform transform-vertical">
+                                <div>
+                                    <a class="item item-1" style="color:wheat">
+                                         <strong>Coming soon</strong>
+                                    </a>
+                                </div>
+                            </div>
+                        }
+                    </div>
+
+                </div>
+            </div>
+            <div class="col-md-8 col-sm-12 col-xs-12">
+                <div class="movie-single-ct main-content">
+                    <h1 class="bd-hd">@Model.Movie.Title<span>@Model.Movie.ReleaseDate?.Year</span></h1>
+                    <div class="social-btn">
+                        @* <a  class="parent-btn"><i class="ion-heart"></i> Add to Favorite</a> *@
+                        <a href="javascript:void(0);" class="parent-btn" id="favoriteBtn" data-movie-id="@Model.Movie.MovieId">
+                            
+                            @if (ViewBag.IsFavorited)
+                            {
+                                <i style="background-color:crimson; color:white" class="ion-heart"></i>
+                                <span>Remove from Favorite</span>
+                            }
+                            else
+                            {
+                                <i class="ion-heart"></i>
+                                <span>Add to Favorite</span>
+                            }
+                        </a>
+                        @* <div class="hover-bnt">
+                            <a href="#" class="parent-btn"><i class="ion-android-share-alt"></i>share</a>
+                            <div class="hvr-item">
+                                <a href="#" class="hvr-grow"><i class="ion-social-facebook"></i></a>
+                                <a href="#" class="hvr-grow"><i class="ion-social-twitter"></i></a>
+                                <a href="#" class="hvr-grow"><i class="ion-social-googleplus"></i></a>
+                                <a href="#" class="hvr-grow"><i class="ion-social-youtube"></i></a>
+                            </div>
+                        </div> *@
+                    </div>
+                    <div class="movie-rate">
+                        <div class="rate">
+                            <i class="ion-android-star"></i>
+                            <p>
+                                <span id="averageRating">@Model.Movie.Rate</span> /10<br>
+                                <span class="rv">@((Model.Movie.Evaluates?.Count ?? 0) > 0 ? Model.Movie.Evaluates?.Count + " Ratings" : "0 Ratings")</span>
+                            </p>
+                            <span style="margin-left: 10px; color: #fff" class="rv">@Model.Movie.View Views</span> <!-- Display the view count here -->
+                        </div>
+
+                        <div class="rate-star">
+                            <p>Rate This Movie: </p>
+                            @* Hiển thị số sao đầy đủ *@
+                            @for (int i = 1; i <= (int)Model.Movie.Rate; i++)
+                            {
+                                <i class="ion-ios-star"></i>
+                            }
+
+                            @* Hiển thị sao một nửa nếu cần thiết *@
+                            @if (Model.Movie.Rate % 1 != 0)
+                            {
+                                <i class="ion-ios-star-half"></i>
+                            }
+
+                            @* Hiển thị số sao rỗng còn lại *@
+                            @for (int i = (int)Model.Movie.Rate
+                            + (Model.Movie.Rate % 1 != 0 ? 1 : 0); i < 10; i++)
+                            {
+                                <i class="ion-ios-star-outline"></i>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="movie-tabs">
+                        <div class="tabs">
+                            <ul class="tab-links tabs-mv">
+                                <li class="@((ViewBag.ActiveTab == "overview") ? "active" : "")">
+                                    <a class="nav-link @(ViewBag.ActiveTab == "overview" ? "active" : "")" id="overview-tab" href="@Url.Action("Detail", new { slug = ViewBag.Slug, activeTab = "overview" })">Overview</a>
+                                </li>
+                                <li class="@((ViewBag.ActiveTab == "reviews") ? "active" : "")">
+                                    <a class="nav-link @(ViewBag.ActiveTab == "reviews" ? "active" : "")" id="reviews-tab" href="@Url.Action("Detail", new { slug = ViewBag.Slug, activeTab = "reviews" })">Reviews</a>
+                                </li>
+
+                                <li class="@((ViewBag.ActiveTab == "cast") ? "active" : "")">
+                                    <a class="nav-link @(ViewBag.ActiveTab == "cast" ? "active" : "")" id="cast-tab" href="@Url.Action("Detail", new { slug = ViewBag.Slug, activeTab = "cast" })">Cast & Crew</a>
+                                </li>
+                                <li class="@((ViewBag.ActiveTab == "moviesrelated") ? "active" : "")">
+                                    <a class="nav-link @(ViewBag.ActiveTab == "moviesrelated" ? "active" : "")" id="moviesrelated-tab" href="@Url.Action("Detail", new { slug = ViewBag.Slug, activeTab = "moviesrelated" })">Related Movies</a>
+                                </li>
+                            </ul>
+                            <div class="tab-content">
+                                <div id="overview" class="tab @(ViewBag.ActiveTab == "overview" ? "active" : "")">
+                                    <div class="row">
+                                        <div class="col-md-8 col-sm-12 col-xs-12">
+                                            <p>@Model.Movie.Description</p>
+                                            <div class="title-hd-sm">
+                                                <h4>cast</h4>
+                                                <a asp-action="Index" 
+                                                   asp-controller="HomeActor" class="time">
+                                                    Full Cast & Crew <i class="ion-ios-arrow-right"></i></a>
+                                            </div>
+                                            <!-- movie cast -->
+                                            <div class="mvcast-item">
+                                                @foreach (var cast in Model.Movie.Actors)
+                                                {
+                                                    <div class="cast-it">
+                                                        <div class="cast-left">
+                                                            <img style="width: 40px;" src="@cast.Image" alt="">
+                                                            <a onclick="window.location.href='@Url.Action("Details", "HomeActor", new { id = cast.ActorId })';"
+                                                               style="cursor: pointer">@cast.Name</a>
+                                                        </div>
+                                                        <p>@cast.Role</p>
+                                                    </div>
+                                                }
+                                            </div>
+                                            @* <div class="title-hd-sm">
+                                                <h4>User reviews</h4>
+                                                <a asp-action="Detail"
+                                                   asp-route-slug="@ViewBag.Slug"
+                                                   asp-route-activeTab="reviews"
+                                                   class="time">
+                                                    See All @Model.Movie.Evaluates.Count() Reviews <i class="ion-ios-arrow-right"></i>
+                                                </a>
+                                            </div>
+                                            <div class="mv-user-review-item" id="reviewsList">
+                                                @if (ViewBag.TopReviews != null && ((List<MoviesWebsite.Models.Movie.Evaluate>)ViewBag.TopReviews).Any())
+                                                {
+                                                    <partial name="_ReviewsPartial" model="ViewBag.TopReviews" />
+                                                }
+                                                else
+                                                {
+                                                    <p>No reviews found for this movie.</p>
+                                                }
+                                            </div> *@
+                                        </div>
+                                        <div class="col-md-4 col-xs-12 col-sm-12">
+                                            <div class="sb-it">
+                                                <h6>Director: </h6>
+                                                @foreach (var director in Model.Movie.Actors.Where(a => a.Role.Equals("Director")))
+                                                {
+                                                    <p>
+                                                        <a onclick="window.location.href='@Url.Action("Details", "HomeActor", new { id = director.ActorId })';"> @director.Name </a>
+                                                    </p>
+                                                }
+                                                
+                                            </div>
+                                            <div class="sb-it">
+                                                <h6>Actors: </h6>
+                                                @foreach (var actor in Model.Movie.Actors.Where(a => a.Role.Equals("Actor")))
+                                                {
+                                                    <p>
+                                                        <a onclick="window.location.href='@Url.Action("Details", "HomeActor", new { id = actor.ActorId })';"> @actor.Name </a>
+                                                    </p>
+                                                }
+                                            </div>
+                                            <div class="sb-it">
+                                                <h6>Genres:</h6>
+                                                @foreach (var cate in Model.Movie.Categories)
+                                                {
+                                                    <p>
+                                                        <a href="#"> @cate.Title </a>
+                                                    </p>
+                                                }
+                                            </div>
+                                            <div class="sb-it">
+                                                <h6>Release Date:</h6>
+                                                @Model.Movie.ReleaseDate?
+                                            </div>
+                                           @*  <div class="sb-it">
+                                                <h6>Run Time:</h6>
+                                                <p>#####</p>
+                                            </div> *@
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="reviews" class="tab @(ViewBag.ActiveTab == "reviews" ? "active" : "")">
+                                    <div class="row">
+                                        <div class="rv-hd">
+                                            <div class="div">
+                                                <h3>Related Movies To</h3>
+                                                <h2>@Model.Movie.Title</h2>
+                                            </div>
+                                            <a class="redbtn" id="write-review-btn" data-authenticated="@User.Identity.IsAuthenticated"
+                                               data-login-url="@Url.Action("Login", "Account", new { area = "Identity" })">Write Review</a>
+                                        </div>
+                                        <!-- Form để viết đánh giá -->
+                                        <form method="post" asp-controller="Home" asp-action="SubmitReview" id="reviewForm" style="display: none; margin-top: 20px;">
+                                            <input type="hidden" name="movieId" value="@Model.Movie.MovieId" />
+                                            <p>Rate This Movie:</p>
+                                            <div class="rate-star-input">
+                                                @for (int i = 1; i <= 10; i++)
+                                                {
+                                                    <i class="ion-ios-star-outline rate-star" data-value="@i"></i>
+                                                }
+                                            </div>
+                                            <input type="hidden" id="rating" name="rating" />
+                                            <textarea id="comment" name="comment" rows="4" placeholder="Write your review here..." style="width: 100%; margin-top: 10px;"></textarea><br />
+                                            <button type="button" class="redbtn" id="submit-review-btn" onclick="submitReview()">Submit Review</button><br />
+                                        </form>
+                                        <div class="topbar-filter">
+                                            <p class="pad-change">Found <span>@ViewBag.Reviews.Count reviews</span> in total</p>
+                                            <label>Filter by:</label>
+                                            <form id="sortForm" asp-action="Detail" method="get">
+						                        <input type="hidden" name="slug" value="@ViewBag.Slug" />
+                                                <input type="hidden" name="currentPage" value="@ViewBag.CurrentPage" />
+						                        <input type="hidden" name="pageSize" value="@ViewBag.PageSize" />
+                                                <input type="hidden" name="activeTab" value="@ViewBag.ActiveTab" />
+
+                                                <select id="sortOrder" name="sortOrder" class="form-control" onchange="changeSortOrder()">
+                                                    @if (ViewBag.SortOrder == "rating_desc")
+                                                    {
+                                                        <option value="rating_desc" selected>Rating Descending</option>
+                                                        <option value="rating_asc">Rating Ascending</option>
+                                                        <option value="date_desc">Release date Descending</option>
+                                                        <option value="date_asc">Release date Ascending</option>
+                                                    }
+                                                    else if (ViewBag.SortOrder == "rating_asc")
+                                                    {
+                                                        <option value="rating_desc">Rating Descending</option>
+                                                        <option value="rating_asc" selected>Rating Ascending</option>
+                                                        <option value="date_desc">Release date Descending</option>
+                                                        <option value="date_asc">Release date Ascending</option>
+                                                    }
+                                                    else if (ViewBag.SortOrder == "date_desc")
+                                                    {
+                                                        <option value="rating_desc">Rating Descending</option>
+                                                        <option value="rating_asc">Rating Ascending</option>
+                                                        <option value="date_desc" selected>Release date Descending</option>
+                                                        <option value="date_asc">Release date Ascending</option>
+                                                    }
+                                                    else if (ViewBag.SortOrder == "date_asc")
+                                                    {
+                                                        <option value="rating_desc">Rating Descending</option>
+                                                        <option value="rating_asc">Rating Ascending</option>
+                                                        <option value="date_desc">Release date Descending</option>
+                                                        <option value="date_asc" selected>Release date Ascending</option>
+                                                    }
+                                                    else
+                                                    {
+                                                        <!-- Default values if SortOrder is not set -->
+                                                        <option value="rating_desc">Rating Descending</option>
+                                                        <option value="rating_asc">Rating Ascending</option>
+                                                        <option value="date_desc">Release date Descending</option>
+                                                        <option value="date_asc">Release date Ascending</option>
+                                                    }
+                                                </select>
+
+
+                                            </form>
+                                        </div>
+                                        <div class="mv-user-review-item" id="reviewsList">
+                                            @if (Model.Reviews != null && Model.Reviews.Any())
+                                            {
+                                                <partial name="_ReviewsPartial" model="Model.Reviews" />
+                                            }
+                                            else
+                                            {
+                                               <p>No reviews found for this movie.</p>
+                                            }
+                                        </div>
+                                        @if (Model.Reviews.Any())
+                                        {
+                                            <div class="topbar-filter">
+                                                <label>Reviews per page:</label>
+                                                <select class="form-select" w-auto id="pageSizeSelect" onchange="changePageSize()">
+                                                    <option value="" disabled selected>Choose number of reviews</option>
+                                                    @for (int i = 0; i <= ViewBag.TotalReviews && i <= 50; i += 5)
+                                                    {
+                                                        if ((int)ViewBag.PageSize == (i + 5))
+                                                        {
+                                                            <option selected value="@(i + 5)">@(i + 5)</option>
+                                                        }
+                                                        else
+                                                        {
+                                                            <option value="@(i + 5)">@(i + 5)</option>
+                                                        }
+                                                    }
+                                                </select>
+ @*                                                <select>
+                                                    <option value="range">5 Reviews</option>
+                                                    <option value="saab">10 Reviews</option>
+                                                </select> *@
+
+                                                <div class="pagination2" style="float: left;">
+                                                    <span>Page @ViewBag.CurrentPage of @ViewBag.PageCount</span>
+
+                                                    @if (ViewBag.CurrentPage > 1)
+                                                    {
+                                                        <a href="@Url.Action("Detail", new { slug = ViewBag.Slug, currentPage = ViewBag.CurrentPage - 1, pageSize = ViewBag.PageSize, sortOrder = ViewBag.SortOrder, activeTab = ViewBag.ActiveTab })" class="pagination-link prev">
+                                                            <i class="ion-arrow-left-b"></i>
+                                                        </a>
+                                                    }
+
+                                                    <!-- Display page numbers -->
+                                                    @for (int i = 1; i <= ViewBag.PageCount; i++)
+                                                    {
+                                                        if (i == ViewBag.CurrentPage)
+                                                        {
+                                                            <a class="active" href="#">@i</a>
+                                                        }
+                                                        else
+                                                        {
+                                                            <a href="@Url.Action("Detail", new { slug = ViewBag.Slug, currentPage = i, pageSize = ViewBag.PageSize, sortOrder = ViewBag.SortOrder, activeTab = ViewBag.ActiveTab })" class="pagination-link">
+                                                                @i
+                                                            </a>
+                                                        }
+                                                    }
+
+                                                    <!-- Hide Next button if on the last page -->
+                                                    @if (ViewBag.CurrentPage < ViewBag.PageCount)
+                                                    {
+                                                        <a href="@Url.Action("Detail", new { id = ViewBag.Slug, currentPage = ViewBag.CurrentPage + 1, pageSize = ViewBag.PageSize,  sortOrder = ViewBag.SortOrder, activeTab = ViewBag.ActiveTab })" class="pagination-link next">
+                                                            <i class="ion-arrow-right-b"></i>
+                                                        </a>
+                                                    }
+                                                </div>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                                <div id="cast" class="tab @(ViewBag.ActiveTab == "cast" ? "active" : "")">
+                                    <div class="row">
+                                        <h3>Cast & Crew of</h3>
+                                        <h2>Avengers: Age of Ultron</h2>
+                                        <!-- //== -->
+                                        <div class="title-hd-sm">
+                                            <h4>Directors & Credit Writers</h4>
+                                        </div>
+                                        <div class="mvcast-item">
+                                            @foreach (var director in Model.Movie.Actors.Where(a => a.Role.Equals("Director")))
+                                            {
+                                                <div class="cast-it">
+                                                    <div class="cast-left">
+                                                        <img style="width: 40px;" src="@director.Image" alt="">
+                                                        <a href="#">@director.Name</a>
+                                                    </div>
+                                                    <p>... Director</p>
+                                                </div>
+                                            }
+                                        </div>
+                                        <!-- //== -->
+                                        <div class="title-hd-sm">
+                                            <h4>Cast</h4>
+                                        </div>
+                                        <div class="mvcast-item">
+                                            @foreach (var actor in Model.Movie.Actors.Where(a => a.Role.Equals("Actor")))
+                                            {
+                                                <div class="cast-it">
+                                                    <div class="cast-left">
+                                                        <img style="width: 40px" src="@actor.Image" alt="">
+                                                        <a onclick="window.location.href='@Url.Action("Details", "HomeActor", new { id = actor.ActorId })';"
+                                                           style="cursor: pointer">@actor.Name</a>
+                                                    </div>
+                                                </div>
+                                            }
+                                            
+                                        </div>
+                                        <!-- //== -->
+                                    </div>
+                                </div>
+                                <div id="moviesrelated" class="tab @(ViewBag.ActiveTab == "moviesrelated" ? "active" : "")">
+                                    <div class="row">
+                                        <h3>Related Movies To</h3>
+                                        <h2>@Model.Movie.Title</h2>
+                                        <div id="moviesrelated-view"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+<script>
+    function changePageSize() {
+        var pageSize = document.getElementById("pageSizeSelect").value;
+        var activeTab = "reviews";
+        var url = '@Url.Action("Detail", new { slug = ViewBag.Slug, currentPage = ViewBag.CurrentPage })';
+        window.location.href = url + "&pageSize=" + pageSize + "&activeTab=" + activeTab;
+    }
+
+    function changeSortOrder() {
+        var sortOrder = document.getElementById("sortOrder").value;
+        var form = document.getElementById("sortForm");
+        form.action = '@Url.Action("Detail", "Home")';
+        form.submit();
+    }
+    $(document).on('click', '#favoriteBtn', function () {
+        var movieId = $(this).data('movie-id');
+        $.ajax({
+            url: '@Url.Action("ToggleFavorite", "Home")',
+            type: 'POST',
+            data: { movieId: movieId },
+            success: function (response) {
+                if (response.success) {
+                    // Cập nhật lại nút dựa vào trạng thái yêu thích
+                    if (response.isFavorited) {
+                        $('#favoriteBtn').html('<i class="ion-heart"></i> Remove from Favorite');
+                        $('#favoriteBtn i').css('background-color', '#dd003f').css('color', 'white');
+                    } else {
+                        $('#favoriteBtn').html('<i class="ion-heart"></i> Add to Favorite');
+                        $('#favoriteBtn i').css('background-color', '').css('color', '');
+                    }
+                } else {
+                    alert(response.message);
+                }
+            },
+            error: function () {
+                alert('Có lỗi xảy ra. Vui lòng thử lại sau.');
+            }
+        });
+    });
+
+
+    document.getElementById('write-review-btn').addEventListener('click', function () {
+        var isAuthenticated = this.getAttribute('data-authenticated') === 'True';
+        var loginUrl = this.getAttribute('data-login-url');
+
+        if (isAuthenticated) {
+            // Hiển thị form đánh giá
+            document.getElementById('reviewForm').style.display = 'block';
+        } else {
+            // Chuyển hướng đến trang đăng nhập
+            window.location.href = loginUrl;
+        }
+    });
+
+    // Xử lý sự kiện nhấn vào các sao để chọn điểm
+    const stars = document.querySelectorAll('.rate-star');
+    let selectedRating = 0;
+
+    stars.forEach(star => {
+        star.addEventListener('click', function () {
+            selectedRating = this.getAttribute('data-value'); // Lấy giá trị của sao được nhấn
+            highlightStars(selectedRating); // Gọi hàm tô màu các sao
+        });
+    });
+
+    function highlightStars(rating) {
+        stars.forEach(star => {
+            const starValue = Number(star.getAttribute('data-value'));
+            if (starValue <= rating) {
+                star.classList.remove('ion-ios-star-outline');
+                star.classList.add('ion-ios-star'); // Đổi sao thành đầy đủ
+            } else {
+                star.classList.remove('ion-ios-star');
+                star.classList.add('ion-ios-star-outline'); // Đổi sao thành rỗng
+            }
+        });
+    }
+
+    // Submit review
+    function submitReview() {
+        // Set the selected rating into the hidden input
+        $("#rating").val(selectedRating);
+
+        // Get the comment text
+        $("#comment").val();
+
+        var reviewForm = $("#reviewForm");
+
+        // Submit the form using AJAX
+        $.ajax({
+            url: '@Url.Action("SubmitReview", "Home")',
+            type: 'POST',
+            data: reviewForm.serialize(),
+            success: function (response) {
+                if (response) {
+                    Swal.fire({
+                        title: 'Success!',
+                        text: 'Review submitted successfully!',
+                        icon: 'success',
+                        confirmButtonText: 'OK'
+                    }).then(() => {
+                        $('#comment').val('');
+                        $('#rating').val(0); // Reset hidden rating input
+                        selectedRating = 0; // Reset selectedRating variable
+
+                        // Reset the stars visually
+                        $('.rate-star').removeClass('ion-ios-star').addClass('ion-ios-star-outline');
+
+                        $('#reviewsList').html(response);
+
+                        location.reload(); // Optionally reload to refresh reviews
+
+                        // Optionally, hide the review form
+                        $('#reviewForm').hide();
+
+                        // Update the average rating
+                        $('#averageRating').text(response.averageRating); // Assuming response contains averageRating
+                    });
+                }
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                Swal.fire({
+                    title: 'Error!',
+                    text: jqXHR.responseText || 'An error occurred while submitting the review.',
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                });
+            }
+        });
+    }
+
+    function DeleteReview(button) {
+        var evaluateId = $(button).data('evaluate-id');
+        var movieId = $(button).data('movie-id');
+
+        // Show SweetAlert2 confirmation dialog
+        Swal.fire({
+            title: 'Are you sure?',
+            text: 'Once deleted, you will not be able to recover this review!',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, delete it!',
+            cancelButtonText: 'No, cancel!',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: '@Url.Action("DeleteReview", "Home")', // Ensure this URL is correct
+                    type: 'POST',
+                    data: {
+                        evaluateId: evaluateId,
+                        movieId: movieId
+                    },
+                    success: function (response) {
+                        console.log("Success:", response); // Check the response returned
+                        if (response) {
+                            // Show success message with SweetAlert2
+                            Swal.fire(
+                                'Deleted!',
+                                'Review deleted successfully!',
+                                'success'
+                            );
+
+                            // Update the reviews list
+                            $('#reviewsList').html(response);
+
+                            // Optionally reload the page if needed
+                            location.reload();
+
+                            // Update the average rating if needed
+                            $('#averageRating').text(response.averageRating); // Assuming response contains averageRating
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("Error Status:", status);
+                        console.error("Error Details:", error);
+                        // Show error message with SweetAlert2
+                        Swal.fire(
+                            'Error!',
+                            'An error occurred while deleting the review.',
+                            'error'
+                        );
+                    }
+                });
+            } else {
+                // Optionally show a message if cancelled
+                Swal.fire(
+                    'Cancelled',
+                    'Your review is safe!',
+                    'info'
+                );
+            }
+        });
+    }
+
+    function openTrailer(trailerUrl) {
+        $('#trailerIframe').attr('src', trailerUrl);
+        $('#trailerModal').modal('show');
+    }
+</script>   
+
+@section Scripts {
+    <script>
+        $("document").ready(function () {
+            console.log("Ready");
+            $.ajax({
+                url: '@Url.Action("RelatedMovies", "ViewMovies")',
+                method: 'Get',
+                data: {
+                    relatedMovie: @Model.Movie.MovieId
+                },
+                success: function (response) {
+                    console.log(response);
+                    $("#moviesrelated-view").html(response)
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error:', status, error);
+                }
+            });
+        });
+
+    </script>
+}

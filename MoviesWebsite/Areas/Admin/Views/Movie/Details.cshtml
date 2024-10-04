@@ -1,0 +1,481 @@
+﻿@using MVC.Menu
+@using Microsoft.AspNetCore.Identity
+@using MoviesWebsite.Data
+
+@inject UserManager<AppUser> UserManager
+
+@model MoviesWebsite.Models.Movie.Movie
+
+@* @model MoviesWebsite.Areas.Admin.Models.MovieCreate
+ *@
+ 
+ @{
+    ViewData["Title"] = "";
+    var ep = ViewData["Episode"] as MoviesWebsite.Areas.Admin.Models.EpisodeAdd;
+
+}
+@inject AdminSidebarService _AdminSidebarService
+<div id="content-wrapper" class="d-flex flex-column">
+    <!-- Main Content -->
+    <div id="content">
+        <!-- Begin Page Content -->
+        <div class="card">
+            <div class="card-body">
+                <div class="mx-auto" style="width: 700px">
+                    <div class="row">
+                        <div class="col-5">
+@*                             @if (Model.ImageUrls != null && Model.ImageUrls.Count > 0)
+                            {
+
+                                <div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="carousel">
+                                    <div class="carousel-indicators">
+                                        @for (int i = 0; i < Model.ImageUrls.Count; i++)
+                                        {
+                                            <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="@i"
+                                                    class="@(i == 0 ? "active" : "")"
+                                                    aria-current="true" aria-label="Slide @i"></button>
+                                        }
+                                    </div>
+                                    <div class="carousel-inner">
+                                        @for (int i = 0; i < Model.ImageUrls.Count; i++)
+                                        {
+                                            <div class="@(i == 0 ? "carousel-item active" : "carousel-item")">
+                                                <img src="@Model.ImageUrls[i]" class="d-block w-100" alt="Image @i">
+                                            </div>
+                                        }
+                                    </div>
+                                    <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
+                                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                        <span class="visually-hidden">Previous</span>
+                                    </button>
+                                    <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
+                                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                        <span class="visually-hidden">Next</span>
+                                    </button>
+                                </div>
+                            }
+ *@
+                       
+                                <img src="@Model.Image" width="230px" height="auto" />
+                        </div>
+                        <div class="col-7">
+                            <h1 class="h3 mb-0 text-info font-weight-bold">@Model.Title</h1>
+                            <p>@Model.Slug</p>
+                            <p>Director: Bùi Thanh Hà</p>
+                            <p>
+                                Actors:
+                                @foreach (var actor in Model.Actors)
+                                {
+                                    <span>@actor.Name (@actor.Role)</span>
+                                }
+                            </p>
+                            <p>
+                                Genres:
+                                @foreach (var cate in Model.Categories)
+                                {
+                                    <span>@cate.Title</span>
+                                }
+                            </p>
+                            <p>Release Date: @Model.CreatedDate?.ToString("MMMM dd, yyyy")</p>
+                            <p>
+                                Rating:
+                                @for (int i = 0; i < Model.Rate; i++)
+                                {
+                                    <i class="fas fa-star text-warning"></i>
+                                }
+                            </p>
+                        </div>
+                    </div>
+                    <div class="d-flex flex-wrap align-items-center my-2" style="gap: 14px">
+                        <span class="text-secondary">New episode: </span>
+                        <div class="button-container d-flex flex-wrap align-items-center">
+                             <div class="d-flex align-items-center mb-2 me-2">
+                                <div class="dropdown">
+                                    <button class="btn btn-secondary mr-2 mb-2 " type="button" id="episodeDropdown" data-bs-toggle="dropdown" onclick="updateVideo('@Model.Trailer'); handleButtonClick(this)">
+                                        @{
+                                            var titleTrailer = "Trailer";
+                                        }
+                                        @titleTrailer
+                                    </button>
+                                    
+                                </div>
+                            </div>
+                            @foreach (var episode in Model.Episodes)
+                            {
+                                <div class="d-flex align-items-center mb-2 me-2">
+                                    <div class="dropdown">
+                                        <button class="btn btn-secondary mr-2 mb-2 " type="button" id="episodeDropdown" data-bs-toggle="dropdown" onclick="updateVideo('@episode.Link'); handleButtonClick(this)">
+                                            @{
+                                                var title = string.Concat(episode.Title?.Split(Model.Title, StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries));
+                                            }
+                                            @title
+                                        </button>
+                                        <ul class="dropdown-menu" aria-labelledby="episodeDropdown">
+                                            <li>
+                                                <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#editEpisodeModal" onclick="setEditEpisode('@episode.EpisodeId', '@title', '@episode.Link', '@episode.Slug', '@episode.MovieId')">Edit</a>
+                                            </li>
+                                            <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#deleteEpisodeModal" onclick="delete123('@episode.EpisodeId')">Delete</a></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            }
+                           
+                            <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#addEpisodeModal">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+
+
+                    @* <div class="video-container">
+                        <iframe id="videoPlayer" width="800" height="500" src="@Model.Trailer" allowfullscreen></iframe>
+                    </div> *@
+                    <!-- Display the selected episode -->
+                    <video id='hls-example' class="video-js vjs-default-skin" width="800" controls>
+                        <source type="application/x-mpegURL" src="@Model.Trailer">
+                    </video>
+                    <div>
+                        <h1 class="h3 text-dark mt-2">Description</h1>
+                        <p>@Model.Description</p>
+                    </div>
+                    <div class="border border-white p-3" style="background-color: azure">
+                        <div class="d-flex justify-content-between">
+                            <span>@Model.Comments.Count comments</span>
+                            <div>
+                          
+                            </div>
+                        </div>
+                        <div class="row mt-2">
+                            <div class="">
+                                @{
+                                    string imgurl = "";
+                                    var user = await UserManager.GetUserAsync(this.User);
+                                    if (!string.IsNullOrWhiteSpace(user.Avatar))
+                                    {
+                                        imgurl = user.Avatar;
+                                    }
+                                    else
+                                    {
+                                        imgurl = "/contents/avata.jpg";
+                                    }
+                                }
+                                <img src="@imgurl"
+                                     alt="..." class="img-thumbnail" style="width: 70px; height: 70px" />
+                            </div>
+                            <div class="col-10">
+                                @{
+                                    var command = new MoviesWebsite.Models.Movie.Comment()
+                                    {
+                                        MovieId = Model.MovieId,
+                                        UserId = UserManager.GetUserId(this.User),
+                                    };
+                                }
+                                <partial name="~/Areas/Admin/Views/Comments/_CreateComment.cshtml" model="@(command)" />
+
+                            </div>
+                        </div>
+
+                        <div id="commentsContainer">
+                            @foreach (var comment in Model.Comments.OrderByDescending(c => c.CreatedDate).Take(2))
+                            {
+                                <div class="row mt-2" id="comment-@comment.CommentId">
+                                    <div class="">
+                                        @{
+                                            imgurl = "";
+
+                                            if (!string.IsNullOrWhiteSpace(comment.User.Avatar))
+                                            {
+                                                imgurl = comment.User.Avatar;
+                                            }
+                                            else
+                                            {
+                                                imgurl = "/contents/avata.jpg";
+                                            }
+                                        }
+                                        <img src="@imgurl"
+                                             alt="..." class="img-thumbnail" style="width: 70px; height: 70px" />
+                                    </div>
+                                    <div class="col-10">
+                                        <div class="d-flex justify-content-between">
+                                            <div style="max-width: 500px">
+                                                <h5 class="text-info">@comment.User.UserName</h5>
+                                                <p id="comment-content-@comment.CommentId">@comment.Content</p>
+                                                <input type="text" id="edit-content-@comment.CommentId" value="@comment.Content" class="form-control d-none" />
+                                            </div>
+                                            <div>
+                                                <div class="dropdown">
+                                                    <i class="fas fa-ellipsis-v" style="cursor: pointer" data-bs-toggle="dropdown"></i>
+                                                    <ul class="dropdown-menu">
+                                                        <li><a class="dropdown-item" href="#" onclick="editComment('@comment.CommentId')">Edit</a></li>
+                                                        <li>
+                                                            <a class="dropdown-item" href="#" onclick="deleteComment('@comment.CommentId')">Delete</a>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="mt-2 d-none" id="edit-buttons-@comment.CommentId">
+                                            <button class="btn btn-secondary" onclick="cancelEdit('@comment.CommentId')">Cancel</button>
+                                            <button class="btn btn-primary" onclick="updateComment('@comment.CommentId')">Update</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+
+                        <div>
+                            <button id="loadMoreBtn" data-skip="2" class="btn-info btn mt-2" style="width:100%" onclick="loadMoreComments(@Model.MovieId)">Load 2 more comments</button>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- /.container-fluid -->
+    </div>
+    @await Html.PartialAsync("~/Areas/Admin/Views/Movie/_AddEpisode.cshtml", ep)
+    @await Html.PartialAsync("_EditEpisode", new MoviesWebsite.Areas.Admin.Models.EpisodeAdd())
+
+</div>
+@section Scripts {
+    @* Validation scripts *@
+    <partial name="_ValidationScriptsPartial" />
+
+    @if (ViewBag.modal == "show")
+    {
+        <script>
+            $(document).ready(function () {
+                $('#addEpisodeModal').modal('show');
+            });
+        </script>
+    }
+}
+<script>
+
+    function loadMoreComments(movieId) {
+        var skipCount = $('#loadMoreBtn').data('skip');
+
+        $.ajax({
+            url: '@Url.Action("LoadMore", "Comments")',
+            type: 'GET',
+            data: { movieId: movieId, skip: skipCount },
+            success: function (response) {
+                $('#commentsContainer').append(response); 
+                $('#loadMoreBtn').data('skip', skipCount + 2); 
+
+                if ($('#commentsContainer').children('.row').length >= @Model.Comments.OrderByDescending(c => c.CreatedDate).Count()) {
+                    $('#loadMoreBtn').hide(); 
+                }
+            },
+            error: function () {
+                alert('Error loading more comments');
+            } 
+        });
+    }
+
+    $(document).ready(function () {
+        if ($('#commentsContainer').children('.row').length >= @Model.Comments.OrderByDescending(c => c.CreatedDate).Count()) {
+            $('#loadMoreBtn').hide(); 
+        }
+    });
+
+    function editComment(commentId) {
+        document.getElementById('comment-content-' + commentId).classList.add('d-none');
+        document.getElementById('edit-content-' + commentId).classList.remove('d-none');
+        document.getElementById('edit-buttons-' + commentId).classList.remove('d-none');
+    }
+
+    function cancelEdit(commentId) {
+        document.getElementById('comment-content-' + commentId).classList.remove('d-none');
+        document.getElementById('edit-content-' + commentId).classList.add('d-none');
+        document.getElementById('edit-buttons-' + commentId).classList.add('d-none');
+    }
+
+    function updateComment(commentId) {
+        var updatedContent = document.getElementById('edit-content-' + commentId).value;
+
+        $.ajax({
+            url: '@Url.Action("Edit", "Comments")/' + commentId,
+            type: 'POST',
+            data: {
+                CommentId: commentId,
+                Content: updatedContent,
+                __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val()
+            },
+            success: function (response) {
+                if (response.success) {
+                    document.getElementById('comment-content-' + commentId).innerText = updatedContent;
+
+                    cancelEdit(commentId);
+
+                    swal("Success!", "The comment has been updated!", "success");
+                } else {
+                    swal("Error!", "Failed to update comment: " + response.message, "error");
+                }
+            },
+            error: function () {
+                swal("Error!", "An error occurred while updating the comment.", "error");
+            }
+        });
+    }
+
+
+    function deleteComment(id) {
+        console.log(id);
+        swal({
+            title: "Are you sure?",
+            text: "Once deleted, you will not be able to recover this comment!",
+            icon: "warning",
+            buttons: true,
+            dangerMode: true,
+        }).then((willDelete) => {
+            if (willDelete) {
+                $.ajax({
+                    url: '@Url.Action("Delete", "Comments")/' + id,
+                    type: 'DELETE',
+                    success: function (response) {
+                        if (response.success) {
+                            @* swal("Poof! The comment has been deleted!", {
+                                icon: "success",
+                            }).then(() => {
+                                location.reload();
+                            }); *@
+                             location.reload();
+                        } else {
+                            swal("Error!", response.message, "error");
+                        }
+                    },
+                    error: function () {
+                        swal("Error!", "There was a problem deleting the comment.", "error");
+                    }
+                });
+            }
+        });
+    }
+    $(document).ready(function () {
+        $('#editEpisodeModal').on('hidden.bs.modal', function () {
+            // Remove the backdrop after the modal is hidden
+            $('.modal-backdrop').remove();
+        });
+    });
+
+    function setEditEpisode(id, title, link, slug, movieId) {
+        document.querySelector('#editEpisodeModal input[name="EpisodeId"]').value = id;
+        document.querySelector('#editEpisodeModal input[name="MovieId"]').value = movieId;
+        document.querySelector('#editEpisodeModal input[name="Slug"]').value = slug;
+        document.querySelector('#editEpisodeModal input[name="Title"]').value = title;
+        document.querySelector('#editEpisodeModal input[name="Link"]').value = link;
+
+        var editModal = new bootstrap.Modal(document.getElementById('editEpisodeModal'));
+        editModal.show();
+    }
+    function deleteEpisode(episodeId) {
+        $.ajax({
+            url: '@Url.Action("DeleteEpisode", "Movie")',
+            type: 'POST',
+            data: { id: episodeId },
+            success: function (response) {
+                if (response.success) {
+
+                    location.reload();
+                } else {
+
+                    alert('Error: ' + response.message);
+                }
+            },
+            error: function () {
+                alert('An error occurred while processing your request.');
+            }
+        });
+    }
+
+    function delete123(episodeId) {
+        swal({
+            title: "Are you sure?",
+            text: "Once deleted you will not be able to recover this data!",
+            icon: "warning",
+            buttons: true,
+            dangerMode: true,
+        }).then((willDelete) => {
+            if (willDelete) {
+                swal("Poof! Your data has been deleted!", {
+                    icon: "success",
+                });
+                deleteEpisode(episodeId);
+            }
+        });
+    }
+</script>
+
+<script>
+    let currentButton = null;
+
+    function handleButtonClick(button) {
+
+        if (currentButton && currentButton !== button) {
+
+            currentButton.classList.remove('btn-primary');
+            currentButton.classList.add('btn-secondary');
+        }
+
+        button.classList.remove('btn-secondary');
+        button.classList.add('btn-primary');
+
+        currentButton = button;
+    }
+    function updateVideo(link) {
+
+        var videoPlayer = document.getElementById('hls-example');
+        videoPlayer.src = link;
+    }
+</script>
+<!-- JS code -->
+<!-- If you'd like to support IE8 (for Video.js versions prior to v7) -->
+<script src="https://vjs.zencdn.net/ie8/ie8-version/videojs-ie8.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/videojs-contrib-hls/5.14.1/videojs-contrib-hls.js"></script>
+<script src="https://vjs.zencdn.net/7.2.3/video.js"></script>
+
+<script>
+    var player = videojs('hls-example');
+    player.play();
+</script>
+
+<style>
+    .video-container {
+        position: relative;
+        width: 100%;
+        height: 0;
+        padding-bottom: 56.25%; /* 16:9 aspect ratio */
+        overflow: hidden;
+    }
+
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+    .btn-secondary:hover {
+        background-color: #6c757d; /* Darker shade for hover */
+        border-color: #6c757d; /* Match the border color */
+    }
+</style>
+
+
+@{
+    user = await _userManager.GetUserAsync(this.User);
+    var hidden = true;
+    if(user != null)
+    {
+        var roles = await _userManager.GetRolesAsync(user);
+        hidden = !roles.Any(r => r == RoleName.Administrator);
+    }
+    _AdminSidebarService.SetActive("Movie", "Index", "Admin",hidden);
+}
+
+@section Sidebar
+{
+    @Html.Raw(_AdminSidebarService.renderHtml())
+}

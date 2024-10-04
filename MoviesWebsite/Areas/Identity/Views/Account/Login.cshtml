@@ -1,0 +1,178 @@
+﻿﻿@using System.Collections.Generic
+@using Microsoft.AspNetCore.Http
+@using Microsoft.AspNetCore.Authentication
+@model LoginViewModel
+@inject SignInManager<AppUser> SignInManager
+
+@{
+    ViewData["Title"] = "Login";
+
+    Layout = "_LoginLayout.cshtml";
+}
+<style>
+    .login-container {
+        max-width: 400px;
+        margin: 50px auto;
+        background-color: white;
+        padding: 40px;
+        border-radius: 10px;
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .login-container h2 {
+        text-align: center;
+        font-weight: bold;
+        margin-bottom: 30px;
+    }
+
+    .form-group label {
+        font-weight: bold;
+    }
+
+    .btn-login {
+        background-color: #ff0055;
+        color: white;
+        font-weight: bold;
+        width: 100%;
+    }
+
+    .btn-login:hover {
+        background-color: #e6004c;
+    }
+
+    .social-login {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 20px;
+    }
+
+    .social-login .btn {
+        width: 48%;
+    }
+
+    .remember-me {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .remember-me a {
+        color: #777;
+        text-decoration: none;
+    }
+
+    .remember-me a:hover {
+        text-decoration: underline;
+    }
+</style>
+
+<!-- Outer Row -->
+
+@* <div class="row justify-content-center">
+
+<div class="col-xl-10 col-lg-12 col-md-9">
+
+<div class="card o-hidden border-0 shadow-lg my-5" style="max-width: 600px;margin: 0 auto;">
+<div class="card-body p-0">
+<div class="">
+<div class="p-5">
+<div class="text-center">
+<h1 class="h4 text-gray-900 mb-4">
+Login!
+</h1>
+</div>
+<form asp-controller="Account" asp-action="Login" asp-route-returnurl="@ViewData["ReturnUrl"]"
+method="post" class="user">
+<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+<div class="form-group">
+<input asp-for="UserNameOrEmail" class="form-control form-control-user" />
+<span asp-validation-for="UserNameOrEmail" class="text-danger"></span>
+</div>
+<div class="form-group">
+<input asp-for="Password" class="form-control form-control-user" />
+<span asp-validation-for="Password" class="text-danger"></span>
+</div>
+
+
+<div class="form-group">
+<div class="custom-control custom-checkbox small">
+<input asp-for="RememberMe" class="custom-control-input">
+<label class="custom-control-label" asp-for="RememberMe">
+@Html.DisplayNameFor(m => m.RememberMe)
+</label>
+</div>
+</div>
+<button type="submit" class="btn btn-primary btn-user btn-block">
+Login
+</button>
+
+
+
+
+</form>
+
+
+
+
+<div class="text-center">
+<a class="small" asp-action="ForgotPassword">
+Forgot password?
+</a>
+</div>
+<div class="text-center">
+<a class="small" asp-action="Register" asp-route-returnurl="@ViewData["ReturnUrl"]">
+Do not have an account? Register
+</a>
+</div>
+
+
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+
+</div> *@
+
+
+<div class="login-container">
+    <h2>LOGIN</h2>
+    <form asp-controller="Account" asp-action="Login" asp-route-returnurl="@ViewData["ReturnUrl"]" method="post"
+        class="user">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div class="form-group">
+            <label for="username">USERNAME:</label>
+            <input asp-for="UserNameOrEmail" type="text" class="form-control" id="username">
+            <span asp-validation-for="UserNameOrEmail" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label for="password">PASSWORD:</label>
+            <input asp-for="Password" type="password" class="form-control" id="password">
+            <span asp-validation-for="Password" class="text-danger"></span>
+        </div>
+        <div class="form-group remember-me">
+            <div>
+                <input asp-for="RememberMe" type="checkbox" id="remember">
+                <label asp-for="RememberMe">
+                    @Html.DisplayNameFor(m => m.RememberMe)
+                </label>
+            </div>
+            <a asp-action="ForgotPassword">Forget password?</a>
+        </div>
+        <button type="submit" class="btn btn-login">LOGIN</button>
+    </form>
+    <div class="text-center mt-3">
+        <a class="font-weight-bold text-primary" asp-action="Register" asp-route-returnurl="@ViewData["ReturnUrl"]">
+            Do not have an account? Register
+        </a>
+    </div>
+</div>
+
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

@@ -1,0 +1,61 @@
+﻿@model MoviesWebsite.Models.Movie.Category
+
+<div class="modal fade" id="editCategory" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content" style="width: 700px">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Category</h5>
+                <button class="close" type="button" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form method="post" asp-route-id="@Model.CategoryId" asp-area="Admin" asp-controller="Categories" asp-action="Edit" id="editCategoryForm">
+                    <input type="hidden" asp-for="CategoryId" id="categoryId" />
+                    <div class="form-group">
+                        <label asp-for="Title" class="control-label"></label>
+                        <input asp-for="Title" id="titleEdit" class="form-control" placeholder="Enter @Html.DisplayNameFor(model => model.Title).ToLower()" />
+                        <span asp-validation-for="Title" class="text-danger" id="categoryTitleUpdateError"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Description" class="control-label"></label>
+                        <textarea asp-for="Description" class="form-control" placeholder="Enter @Html.DisplayNameFor(model => model.Description).ToLower()"></textarea>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button class="btn btn-primary" type="button" onclick="CheckExitCategory(@Model.CategoryId)">Save</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<partial name="_ValidationScriptsPartial" />
+
+<script>
+    function CheckExitCategory(id) {
+        var title = $("#titleEdit").val().trim();
+
+        if (title) {
+            $.ajax({
+                url: '@Url.Action("CheckCategoryUpdateExists", "Categories")',
+                type: 'GET',
+                data: { title: title, id: id },
+                success: function (response) {
+                    if (response) {
+                        $('#categoryTitleUpdateError').text('Title has already existed.');
+                    } else {
+                        $('#categoryTitleUpdateError').text('');
+                        $("#editCategoryForm").submit();
+                    }
+                },
+                error: function () {
+                    console.log("An error occurred while checking category title.");
+                }
+            });
+        } else {
+            $('#categoryTitleUpdateError').text('Title is required.');
+        }
+    }
+</script>

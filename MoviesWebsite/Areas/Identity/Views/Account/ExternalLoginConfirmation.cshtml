@@ -1,0 +1,34 @@
+﻿@model ExternalLoginConfirmationViewModel
+@{
+    ViewData["Title"] = "Login";
+}
+
+<h1>@ViewData["Title"].</h1>
+<h3>Make an account link @ViewData["ProviderDisplayName"].</h3>
+
+<form asp-controller="Account" asp-action="ExternalLoginConfirmation" asp-route-returnurl="@ViewData["ReturnUrl"]" method="post" class="form-horizontal" role="form">
+    <h4>Link Information</h4>
+    <hr />
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <p class="text-info">
+        You have confirm to link with <strong>@ViewData["ProviderDisplayName"]</strong>.
+        Please enter your email address to link or create an account.
+    </p>
+    <div class="form-group">
+        <label asp-for="Email" class="col-md-2 control-label"></label>
+        <div class="col-md-10">
+            <input asp-for="Email" class="form-control" />
+            <span asp-validation-for="Email" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="col-md-offset-2 col-md-10">
+            <button type="submit" class="btn btn-default">Login</button>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+}

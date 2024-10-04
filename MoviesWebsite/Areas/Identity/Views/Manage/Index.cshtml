@@ -1,0 +1,316 @@
+﻿@model IndexViewModel
+<style>
+    .layout {
+        display: flex;
+        flex-wrap: nowrap;
+        padding: 20px;
+    }
+
+    /* Tổng quan cho sidebar */
+    .sidebarUser {
+        width: 200px;
+        background-color: #233a50;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        margin-right: 24px;
+    }
+
+    .sidebarUser ul {
+        list-style-type: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .sidebarUser ul li {
+        margin-bottom: 15px;
+    }
+
+    .sidebarUser ul li a {
+        display: flex;
+        align-items: center;
+        padding: 10px 15px;
+        color: white;
+        text-decoration: none;
+        border-radius: 5px;
+        transition: background-color 0.3s ease, border 0.3s ease;
+    }
+
+    .sidebarUser ul li a i {
+        margin-right: 10px;
+        font-size: 16px;
+    }
+
+    /* Hover effect */
+    .sidebarUser ul li a:hover {
+        background-color: #007bff;
+        border: 2px solid #ccc;
+    }
+
+    /* Active state khi sử dụng focus */
+    .sidebarUser ul li a:focus {
+        background-color: #007bff;
+        color: #fff;
+        border: 2px solid #0056b3;
+        outline: none;
+        /* Ẩn đường viền focus mặc định */
+    }
+
+
+    .main-content {
+        flex-grow: 1;
+    }
+
+    .profile-container {
+        background-color: #233a50;
+        border-radius: 15px;
+        padding: 30px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .profile-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .profile-header img {
+        border-radius: 50%;
+        width: 80px;
+        height: 80px;
+        object-fit: cover;
+    }
+
+    .profile-header h5 {
+        margin: 0;
+        font-size: 1.2rem;
+    }
+
+    .profile-header p {
+        margin: 0;
+        color: #6c757d;
+    }
+
+    .profile-edit-btn {
+        background-color: #007bff;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-label {
+        font-weight: bold;
+        color: white;
+        display: block;
+    }
+
+    .form-value {
+        background-color: #f1f1f1;
+        padding: 10px;
+        border-radius: 5px;
+        display: block;
+        font-size: 2rem;
+        color: #495057;
+    }
+
+    .email-info {
+        margin-top: 30px;
+    }
+
+    .email-info i {
+        color: #007bff;
+    }
+
+    .add-email-btn {
+        background-color: #e1e9fc;
+        color: #007bff;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        margin-top: 10px;
+    }
+
+    .profile-container1 {
+        max-width: 500px;
+        margin: 50px auto;
+        background-color: #f8f9fa;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .profile-avatar {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .profile-avatar img {
+        border-radius: 50%;
+        width: 150px;
+        height: 150px;
+        object-fit: cover;
+        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .form-group label {
+        font-weight: bold;
+    }
+
+    .btn-save {
+        cursor: pointer;
+        color: white;
+        font-size: 1.5em;
+        margin-top: 10px;
+        margin: 0 auto;
+        display: block;
+        border: none;
+        background-color: transparent;
+        text-align: center;
+        transition: all 0.3s ease-in-out;
+        font-weight: 500;
+        background-color: #007bff;
+        border: 1px solid #007bff;
+        padding: 5px 10px;
+        border-radius: 5px;
+    }
+</style>
+
+<div class="test" style="color: #abb7c4;">
+    @* <h1>Manage your account</h1> *@
+    @* <h1>@ViewData["Title"].</h1> *@
+    <p class="text-success">@ViewData["Messages"]</p>
+
+    <div class="layout">
+        <div class="sidebarUser">
+            <ul class="">
+                <li class="">
+                    <a class="" asp-area="" asp-action="Index" asp-controller="Histories" id="history">
+                        <i class="fas fa-history"></i> History
+                    </a>
+                </li>
+                <li class="">
+                    <a class="" asp-area="" asp-action="Index" asp-controller="Favourites" id="favorite">
+                        <i class="fas fa-heart"></i> Favorite
+                    </a>
+                </li>
+                <li class="">
+                    @if (Model.HasPassword)
+                    {
+                        <a asp-controller="Manage" asp-action="ChangePassword">Change Password</a>
+                    }
+                    else
+                    {
+                        <a asp-controller="Manage" asp-action="SetPassword">Create Password</a>
+                    }
+            </li>
+            </ul>
+        </div>
+
+        <div class="main-content">
+            <div class="profile-container">
+                <div class="profile-header">
+                    <div style="display: flex; align-items: center;gap:20px">
+                        <div>
+                            @if (!string.IsNullOrWhiteSpace(Model.profile.Avatar))
+                            {
+                                <img src="@Model.profile.Avatar" alt="User Profile Picture" />
+                            }
+                            else
+                            {
+                                <img src="/contents/avata.jpg" alt="User Profile Picture" />
+                            }
+                        </div>
+
+                    </div>
+                    <a asp-action="EditProfile" style="margin-left: auto; color: #007bff; text-decoration: none;
+                        border: 1px solid #007bff; padding: 5px 10px; border-radius: 5px;
+                        font-size: 14px; font-weight: 500;
+                        cursor: pointer;
+                        background-color: #fff;
+                        transition: all 0.3s ease-in-out;">Edit</a>
+
+
+                </div>
+
+                <form class="mt-4">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="fullName" class="form-label">
+                                    @Html.DisplayNameFor(m => Model.profile.UserName)
+                                </label>
+                                <span id="fullName" class="form-value ">
+                                    @Html.DisplayFor(m => Model.profile.UserName)
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="email" class="form-label">
+                                    @Html.DisplayNameFor(m => Model.profile.UserEmail)
+                                </label>
+                                <span id="nickName" class="form-value">
+                                    @Html.DisplayFor(m => Model.profile.UserEmail)
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="gender" class="form-label">
+                                    @Html.DisplayNameFor(m => Model.profile.PhoneNumber)
+                                </label>
+                                <span id="gender" class="form-value">
+                                    @{
+                                        if (Model.profile.PhoneNumber == null)
+                                        {
+                                            <span>
+                                                <a href="#" class="add-phone-btn">
+                                                    xxx
+                                                </a>
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span>@Html.DisplayFor(m => Model.profile.PhoneNumber)</span>
+                                        }
+                                    }
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="country" class="form-label">
+                                    @Html.DisplayNameFor(m => Model.profile.BirthDate)
+                                </label>
+                                <span id="country" class="form-value">
+                                    @{
+                                        if (Model.profile.BirthDate == null)
+                                        {
+                                            <span>
+                                                <a href="#" class="add-birthdate-btn">
+                                                    xxx
+                                                </a>
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span>@Html.DisplayFor(m => Model.profile.BirthDate)</span>
+                                        }
+                                    }
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+</div>

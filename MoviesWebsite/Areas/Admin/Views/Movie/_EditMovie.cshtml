@@ -1,0 +1,197 @@
+﻿@using MoviesWebsite.Areas.Admin.Models
+@model MovieEdit
+
+<div class="modal fade" id="editMovie" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content" style="width: 700px">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Movie</h5>
+                <button class="close" type="button" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form method="post" asp-route-id="@Model.MovieId" asp-area="Admin" asp-controller="Movie" asp-action="Edit" id="editMovieForm" enctype="multipart/form-data">
+                    <input type="hidden" asp-for="MovieId" class="form-control" placeholder="Enter movie title" />
+                    @* Title *@
+                    <div class="form-group">
+                        <label asp-for="Title" class="control-label"></label>
+                        <input asp-for="Title" id="titleEdit" class="form-control" placeholder="Enter movie title" />
+                        <span asp-validation-for="Title" class="text-danger" id="movieTitleUpdateError"></span>
+                    </div>
+
+                    @* Description *@
+                    <div class="form-group">
+                        <label asp-for="Description" class="control-label"></label>
+                        <textarea asp-for="Description" class="form-control" placeholder="Enter description"></textarea>
+                        <span asp-validation-for="Description" class="text-danger"></span>
+                    </div>
+
+                    @* Categories *@
+                    <div class="form-group">
+                        <label asp-for="CategoriesIds" class="control-label">Category</label>
+                        <select asp-for="CategoriesIds" class="js-select2 form-control" multiple="multiple"
+                            asp-items="@ViewBag.CategoryList">
+                        </select>
+                        <span asp-validation-for="Categories" class="text-danger"></span>
+                    </div>
+
+                    @* Directors *@
+                    <div class="form-group">
+                        <div> <label asp-for="DirectorIds" class="control-label">Director</label></div>
+                        <select asp-for="DirectorIds" class="js-select2 form-control" multiple="multiple"
+                            asp-items="@ViewBag.DirectorList">
+                        </select>
+                        <span asp-validation-for="Actors" class="text-danger"></span>
+                    </div>
+
+                    @* Actors *@
+                    <div class="form-group">
+                        <div> <label asp-for="ActorIds" class="control-label">Actors</label></div>
+                        <select asp-for="ActorIds" class="js-select2 form-control" multiple="multiple"
+                            asp-items="@ViewBag.ActorList">
+                        </select>
+                        <span asp-validation-for="Actors" class="text-danger"></span>
+                    </div>
+
+                    @* Image *@
+                    <div class="form-group">
+                        <label asp-for="FileUploads" class="control-label"></label>
+                        <input type="file" class="form-control" name="FileUploads" id="fileUploadEdit" multiple />
+                        <span asp-validation-for="FileUploads" class="text-danger"></span>
+                    </div>
+
+                    @* Image Preview *@
+                    <div class="form-group">
+                        <label>Image Preview</label>
+                        <div id="imagePreviewsEdit" style="display: flex; gap: 10px; flex-wrap: wrap;">
+                            @if (!string.IsNullOrEmpty(Model.Image))
+                            {
+                                var imageUrls = Model.Image.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                                foreach (var imageUrl in imageUrls)
+                                {
+                                    <img src="@imageUrl" alt="Movie Image" style="width:150px; height:150px;" />
+                                }
+                            }
+                            else
+                            {
+                                <img id="previewImageEdit" src="/contents/nophoto.png" alt="Image Preview"
+                                    style="max-width:100%; height:auto;" />
+                            }
+                        </div>
+                    </div>
+
+                    @* Series (Type) *@
+                    <div class="form-group">
+                        <label asp-for="Series" class="control-label">Type</label>
+                        <div class="form-check">
+                            <input asp-for="Series" class="form-check-input" type="checkbox" id="series_movie" />
+                            <label class="form-check-label" for="series_movie">Is TV series</label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <input asp-for="Trailer" class="form-control" type="file" accept="video/*" hidden />
+                    </div>
+
+
+                    @* Trailer Link *@
+                    <div class="form-group">
+                        <label asp-for="TrailerUpload" class="control-label"></label>
+                        <input asp-for="TrailerUpload" class="form-control" type="file" accept="video/*" />
+                        <span asp-validation-for="TrailerUpload" class="text-danger"></span>
+                    </div>
+
+                    @* Release Date *@
+                    <div class="form-group">
+                        <label asp-for="ReleaseDate" class="control-label"></label>
+                        <input asp-for="ReleaseDate" class="form-control" type="date" />
+                        <span asp-validation-for="ReleaseDate" class="text-danger"></span>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button class="btn btn-primary" type="button" onclick="CheckExitMovie(@Model.MovieId)">Save</button>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    function CheckExitMovie(id) {
+        var title = $("#titleEdit").val().trim();
+
+        if (title) {
+            $.ajax({
+                url: '@Url.Action("CheckMovieUpdateExists", "Movie")',
+                type: 'GET',
+                data: { title: title, id: id },
+                success: function (response) {
+                    if (response) {
+                        $('#movieTitleUpdateError').text('Title has already existed.');
+                    } else {
+                        $('#movieTitleUpdateError').text('');
+                        $("#editMovieForm").submit();
+                    }
+                },
+                error: function () {
+                    console.log("An error occurred while checking movie title.");
+                }
+            });
+        } else {
+            $('#movieTitleUpdateError').text('Title is required.');
+        }
+    }
+
+    $(document).ready(function () {
+        $('#editMovie').on('shown.bs.modal', function () {
+            $('.js-select2').select2({
+                width: '100%'
+            });
+        });
+
+        // Handle image file input change to show multiple previews
+        $('#fileUploadEdit').on('change', function (event) {
+            var files = event.target.files;
+            $('#imagePreviewsEdit').empty(); // Clear existing previews
+
+            $.each(files, function (index, file) {
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    var dataURL = e.target.result;
+                    var imageContainer = $('<div>').addClass('image-container position-relative m-2');
+                    var img = $('<div>')
+                        .addClass('image-preview')
+                        .css({
+                            'background-image': 'url(' + dataURL + ')',
+                            'background-size': 'cover',
+                            'background-position': 'center',
+                            'width': '150px',
+                            'height': '150px'
+                        });
+
+                    // Add remove button to each image preview
+                    var removeButton = $('<button>')
+                        .addClass('btn btn-danger btn-sm position-absolute')
+                        .css({ 'top': '5px', 'right': '5px' })
+                        .text('X')
+                        .on('click', function () {
+                            var fileInput = $('#fileUploadEdit')[0];
+                            var newFileList = Array.from(fileInput.files).filter(f => f !== file);
+                            var dataTransfer = new DataTransfer();
+                            newFileList.forEach(f => dataTransfer.items.add(f));
+                            fileInput.files = dataTransfer.files;
+
+                            $(this).closest('.image-container').remove();
+                        });
+
+                    imageContainer.append(img).append(removeButton);
+                    $('#imagePreviewsEdit').append(imageContainer);
+                };
+                reader.readAsDataURL(file);
+            });
+        });
+    });
+</script>

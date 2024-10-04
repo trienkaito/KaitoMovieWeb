@@ -1,0 +1,82 @@
+﻿@using MoviesWebsite.Data
+@model MoviesWebsite.Models.Movie.Actor
+@inject AdminSidebarService _AdminSidebarService
+<div class="card">
+    <div class="card-body">
+        <div class="mx-auto" style="width: 700px">
+            <div class="row">
+                <div class="col-5">
+                    @if (!string.IsNullOrEmpty(Model.Image))
+                    {
+                        <img src="@Model.Image" width="230px" height="auto" />
+                    } 
+                    else
+                    {
+                        <img src="/contents/avata.jpg" width="230px" height="auto" />
+                    }
+                </div>
+                <div class="col-7">
+                    <h1 class="h3 mb-0 text-info font-weight-bold ">
+                        @Model.Name
+                    </h1>
+                    <p class="">
+                        @Model.Role
+                    </p>
+                    <div class="d-flex" style="gap: 5px">
+                        <a id="@Model.ActorId"
+                           class="btn btn-warning"
+                           onclick="editActor(@Model.ActorId)">Edit</a>
+                        <a asp-action="Index" class="btn btn-secondary">Back To List</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Modal-->
+<div id="edit">
+</div>
+
+@section Scripts {
+
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script src="~/jsNew//js/jquery.min.js"></script>
+    <script src="~/jsNew/js/bootstrap.min.js"></script>
+
+    <script>
+        function editActor(id) {
+            $.ajax({
+                url: '@Url.ActionLink("EditPartialView", "Actor")/' + id,
+                type: 'GET',
+                success: function (response) {
+                    $('#edit').html(response)
+                    $("#editActor").modal("show");
+                },
+                error: function (error) {
+                    console.log("error")
+                }
+            });
+        };
+    </script>
+
+}
+
+@{
+    var user = await _userManager.GetUserAsync(this.User);
+    var hidden = true;
+    if (user != null)
+    {
+        var roles = await _userManager.GetRolesAsync(user);
+        hidden = !roles.Any(r => r == RoleName.Administrator);
+    }
+    _AdminSidebarService.SetActive("Actor", "Index", "Admin",hidden);
+}
+
+@section Sidebar
+{
+    @Html.Raw(_AdminSidebarService.renderHtml())
+}

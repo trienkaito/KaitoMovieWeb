@@ -1,0 +1,216 @@
+﻿@using MoviesWebsite.Data
+@using MoviesWebsite.Models.Movie
+@model IEnumerable<MoviesWebsite.Models.Movie.Actor>
+@inject AdminSidebarService _AdminSidebarService
+
+@{
+    ViewData["Title"] = "Manager Actor";
+    ActorViewModel actorViewModel;
+}
+
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <div class="d-flex">
+            <div class="" style="flex: 1">
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addActor">
+                    Add Actor
+                </button>
+            </div>
+
+            <form asp-action="Index" method="get">
+                <div class="input-group mr-3" style="flex: 1; width: 500px">
+
+                    <input type="text" name="keyword" class="form-control bg-light border-0 small"
+                        placeholder="Search for..." aria-label="Search" aria-describedby="basic-addon2"
+                        value="@ViewBag.Keyword" />
+                    <div class="input-group-append">
+                        <button class="btn btn-primary" type="submit">
+                            <i class="fas fa-search fa-sm"></i>
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="card-body">
+        @if (Model != null && Model.Any())
+        {
+            <div class="table-responsive" style="color: black;">
+                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Role</th>
+                            <th>Image</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @foreach (var actor in Model)
+                        {
+                            <tr>
+                                <td onclick="window.location.href='@Url.Action("Details", "Actor", new { id = actor.ActorId })';"
+                                    style="cursor: pointer">
+                                    @actor.Name
+                                </td>
+                                <td>@actor.Role</td>
+                                <td>
+                                    @if (!string.IsNullOrEmpty(actor.Image))
+                                    {
+                                        <img src="@actor.Image" width="70px" height="70px" class="rounded-circle" alt="..." />
+                                    }
+                                    else
+                                    {
+                                        <span>
+                                            <img src="/contents/avata.jpg" width="70px" height="70px" class="rounded-circle"
+                                                alt="..." />
+                                        </span>
+                                    }
+                                </td>
+                                <td class="text-center">
+                                    <a id="@actor.ActorId" class="text-warning btn-circle" onclick="editActor(@actor.ActorId)">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+
+                                    <a class="delete-actor btn text-danger btn-circle" onclick="deleteActor(@actor.ActorId)">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+                <!-- //paging -->
+                <div class="d-flex justify-content-end">
+                    <nav aria-label="Page navigation example">
+                        <ul class="pagination">
+                            <li class="page-item @(ViewBag.CurrentPage == 1 ? "disabled" : "")">
+                                <a class="page-link"
+                                    href="@((ViewBag.CurrentPage > 1) ? Url.Action("Index", new { currentPage = ViewBag.CurrentPage - 1, pageSize = ViewBag.PageSize, keyword = ViewBag.Keyword  }) : "#")">&laquo;
+                                    Previous</a>
+                            </li>
+
+                            @for (int i = 1; i <= ViewBag.PageCount; i++)
+                            {
+                                <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                                    <a class="page-link"
+                                        href="@Url.Action("Index", new { currentPage = i, pageSize = ViewBag.PageSize, keyword = ViewBag.Keyword  })">@i</a>
+                                </li>
+                            }
+
+                            <li class="page-item @(ViewBag.CurrentPage == ViewBag.PageCount ? "disabled" : "")">
+                                <a class="page-link"
+                                    href="@((ViewBag.CurrentPage < ViewBag.PageCount) ? Url.Action("Index", new { currentPage = ViewBag.CurrentPage + 1, pageSize = ViewBag.PageSize, keyword = ViewBag.Keyword  }) : "#")">Next
+                                    &raquo;</a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        }
+        else if (ViewBag.CurrentPage > 1 && ViewBag.PageSize < 1)
+        {
+            <script>
+                window.location.href = '@Url.Action("Index", new { currentPage = ViewBag.CurrentPage - 1, pageSize = ViewBag.PageSize, keyword = ViewBag.Keyword })';
+            </script>
+        }
+        else
+        {
+            <p class="text-center">No actors available.</p>
+        }
+    </div>
+</div>
+
+@{
+    actorViewModel = new ActorViewModel
+            {
+                Actor = new Actor(),
+                Roles = new List<SelectListItem>
+{
+new SelectListItem { Value = "Actor", Text = "Actor" },
+new SelectListItem { Value = "Director", Text = "Director" }
+}
+            };
+}
+
+<partial name="_AddActor" model="@actorViewModel" />
+
+<!-- Edit Modal-->
+<div id="edit">
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script src="~/jsNew//js/jquery.min.js"></script>
+    <script src="~/jsNew/js/bootstrap.min.js"></script>
+
+    <script>
+        function editActor(id) {
+            $.ajax({
+                url: '@Url.ActionLink("EditPartialView", "Actor")/' + id,
+                type: 'GET',
+                success: function (response) {
+                    $('#edit').html(response)
+                    $("#editActor").modal("show");
+                },
+                error: function (error) {
+                    console.log("error")
+                }
+            });
+        };
+    </script>
+
+    <script>
+        function deleteActor(id) {
+            swal({
+                title: "Are you sure?",
+                text: "Once deleted, you will not be able to recover this actor!",
+                icon: "warning",
+                buttons: true,
+                dangerMode: true,
+            }).then((willDelete) => {
+                if (willDelete) {
+                    $.ajax({
+                        url: '@Url.Action("Delete", "Actor")/' + id,
+                        type: 'DELETE',
+                        success: function (response) {
+                            if (response.success) {
+                                swal("Poof! The actor has been deleted!", {
+                                    icon: "success",
+                                }).then(() => {
+                                    location.reload();
+                                });
+                            } else {
+                                swal("Error!", response.message, "error");
+                            }
+                        },
+                        error: function () {
+                            swal("Error!", "There was a problem deleting the actor.", "error");
+                        }
+                    });
+                }
+            });
+        }   
+    </script>
+
+}
+
+@{
+    var user = await _userManager.GetUserAsync(this.User);
+    var hidden = true;
+    if (user != null)
+    {
+        var roles = await _userManager.GetRolesAsync(user);
+        hidden = !roles.Any(r => r == RoleName.Administrator);
+    }
+    _AdminSidebarService.SetActive("Actor", "Index", "Admin",hidden);
+}
+
+@section Sidebar
+{
+    @Html.Raw(_AdminSidebarService.renderHtml())
+}

@@ -1,0 +1,21 @@
+﻿<div class="main">
+    <link href="~/client/css/search-bar.css" rel="stylesheet" />
+    <div class="search-container ">
+        <div class="search-bar">
+            <form class="top-search1 container" method="get" asp-area="" asp-controller="ViewMovies" asp-action="Index">
+                <input class="dropdown" name="searchString" id="searchGlobal" value="@ViewData["searchString"]"
+                    type="text" placeholder="Search for a movie" id="searchInput">
+            </form>
+
+        </div>
+        
+        <div class="search-loading" id="search-loading" style="display:none">
+            <div  hidden class="loader"></div>
+        </div>
+        @* <div class="search-result top-search1 container">
+
+        </div> *@
+        <div class="search-results" style="display:none"></div>
+    </div>
+
+</div>

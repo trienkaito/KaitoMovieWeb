@@ -1,0 +1,7 @@
+﻿@model MoviesWebsite.Models.Movie.Category
+
+<div >    
+    <form id="delete-form" asp-area="Admin" asp-controller="Categories" asp-action="Delete" asp-route-id="@Model.CategoryId" method="post">
+        <input type="hidden" asp-for="CategoryId" />
+    </form>
+</div>

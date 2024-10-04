@@ -1,0 +1,16 @@
+﻿@using static MoviesWebsite.Controllers.ViewMoviesController
+@model ViewCategory
+@{
+	var toYear = ViewData["ToYear"] as SelectList;
+}
+
+<div class="col-md-6">
+	<select asp-for="ToYear"
+			id="select-to-year"
+			disabled
+			asp-items="@toYear"
+			class="fluid dropdown">
+		<option selected value="">To</option>
+	</select>
+</div>
+

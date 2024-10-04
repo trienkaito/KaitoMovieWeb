@@ -1,0 +1,203 @@
+﻿@model IEnumerable<MoviesWebsite.Models.Movie.Actor>
+
+@{
+	var currentPage = Convert.ToInt32(ViewContext.HttpContext.Request.Query["page"].FirstOrDefault() ?? "1");
+}
+
+<div class="hero common-hero">
+	<div class="container">
+		<div class="row">
+			<div class="col-md-12">
+				<div class="hero-ct">
+					<h1>celebrity listing - list</h1>
+					<ul class="breadcumb">
+						<li class="active"><a asp-action="Index" asp-controller="Home">Home</a></li>
+						<li> <span class="ion-ios-arrow-right"></span> celebrity listing</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- celebrity list section-->
+<div class="page-single">
+	<div class="container">
+		<div class="row ipad-width2">
+			<div class="col-md-9 col-sm-12 col-xs-12">
+				<div class="topbar-filter">
+					<p class="pad-change">Found <span>@Model.Count() celebrities</span> in total</p>
+					<label>Sort by:</label>
+					<form id="sortFormList" asp-action="IndexList" method="get">
+						<input type="hidden" name="currentPageList" value="@ViewBag.CurrentPageList" />
+						<input type="hidden" name="pageSizeList" value="@ViewBag.PageSizeList" />
+						<select id="sortOrderList" name="sortOrderList" class="form-control" onchange="applySortOrder()">
+							@if (ViewBag.SortOrderList == "name_desc")
+							{
+								<option value="name_desc" selected>Name Descending</option>
+								<option value="name_asc">Name Ascending</option>
+							}
+							else
+							{
+								<option value="name_desc">Name Descending</option>
+								<option value="name_asc" selected>Name Ascending</option>
+							}
+						</select>
+					</form>
+
+					<a asp-action="IndexList" asp-controller="HomeActor" class="list"
+					   asp-route-currentPageList="@ViewBag.CurrentPageList"
+					   asp-route-pageSizeList="@ViewBag.PageSizeList"
+					   asp-route-searchNameList="@ViewBag.SearchNameList"
+					   asp-route-searchRoleList="@ViewBag.SearchRoleList"
+					   asp-route-sortOrderList="@ViewBag.SortOrderList">
+						<i class="ion-ios-list-outline"></i>
+					</a>
+					<a asp-action="Index" asp-controller="HomeActor" class="grid"
+					   asp-route-currentPage="@ViewBag.CurrentPageList"
+					   asp-route-pageSize="@ViewBag.PageSizeList"
+					   asp-route-searchName="@ViewBag.SearchNameList"
+					   asp-route-searchRole="@ViewBag.SearchRoleList"
+					   asp-route-sortOrder="@ViewBag.SortOrderList">
+						<i class="ion-grid "></i>
+					</a>
+				</div>
+				@if (Model.Any())
+				{
+					<div class="row">
+						@foreach (var item in Model)
+						{
+							<div class="col-md-12">
+								<div class="ceb-item-style-2">
+									@if (!string.IsNullOrEmpty(item.Image))
+									{
+										<img src="@item.Image" width="120px" height="70px" style="object-fit: cover;" alt="..." />
+									}
+									else
+									{
+										<span>
+											<img src="/contents/avata.jpg" width="120px" height="70px" style="object-fit: cover;" alt="..." />
+										</span>
+									}
+									<div class="ceb-infor">
+										<h2>
+											<a onclick="window.location.href='@Url.Action("Details", "HomeActor", new { id = item.ActorId })';"
+											   style="cursor: pointer">@item.Name</a>
+										</h2>
+										<span>@item.Role</span>
+										<p>Dan Stevens was born at Croydon in Surrey on 10th October 1982. His parents are teachers. He was educated at Tonbridge School and trained in acting at the National Youth Theatre of Great Britain... </p>
+									</div>
+								</div>
+							</div>
+
+						}
+					</div>
+				}
+				else
+				{
+					<p class="text-danger font-weight-bold fs-25" style="color: #EF5A6F; font-weight: bold">No actors found.</p>
+				}
+				@if (Model.Any())
+				{
+					<div class="topbar-filter">
+						<label>Reviews per page:</label>
+						<select class="form-select w-auto" id="pageSizeList" onchange="changePageSize()">
+							<option value="" disabled selected>Choose number of reviews</option>
+							@for (int i = 0; i <= ViewBag.TotalActorsList && i <= 50; i += 5)
+							{
+								if ((int)ViewBag.PageSizeList == (i + 5))
+								{
+									<option selected value="@(i + 5)">@(i + 5)</option>
+								}
+								else
+								{
+									<option value="@(i + 5)">@(i + 5)</option>
+								}
+							}
+						</select>
+
+
+						<div class="pagination2">
+							<span>Page @ViewBag.CurrentPageList of @ViewBag.PageCountList</span>
+
+							<!-- Ẩn nút Previous nếu đang ở trang đầu -->
+							@if (ViewBag.CurrentPageList > 1)
+							{
+								<a href="@Url.Action("IndexList", new { currentPageList = ViewBag.CurrentPageList - 1, pageSizeList = ViewBag.PageSizeList, searchNameList = ViewBag.SearchNameList, searchRoleList = ViewBag.SearchRoleList, sortOrderList = ViewBag.SortOrderList })">
+									<i class="ion-arrow-left-b"></i>
+								</a>
+							}
+
+							<!-- Hiển thị các số trang -->
+							@for (int i = 1; i <= ViewBag.PageCountList; i++)
+							{
+								if (i == ViewBag.CurrentPageList)
+								{
+									<a class="active" href="#">@i</a>
+								}
+								else
+								{
+									<a href="@Url.Action("IndexList", new { currentPageList = i, pageSizeList = ViewBag.PageSizeList, searchNameList = ViewBag.SearchNameList, searchRoleList = ViewBag.SearchRoleList, sortOrderList = ViewBag.SortOrderList })">@i</a>
+								}
+							}
+
+							<!-- Ẩn nút Next nếu đang ở trang cuối -->
+							@if (ViewBag.CurrentPageList < ViewBag.PageCountList)
+							{
+								<a href="@Url.Action("IndexList", new { currentPageList = ViewBag.CurrentPageList + 1, pageSizeList = ViewBag.PageSizeList, searchNameList = ViewBag.SearchNameList, searchRoleList = ViewBag.SearchRoleList, sortOrderList = ViewBag.SortOrderList })">
+									<i class="ion-arrow-right-b"></i>
+								</a>
+							}
+						</div>
+					</div>
+				}
+			</div>
+			<div class="col-md-3 col-xs-12 col-sm-12">
+				<div class="sidebar">
+					<div class="searh-form">
+						<h4 class="sb-title">Filter celebrity</h4>
+						<form class="form-style-1 celebrity-form" asp-action="IndexList" method="get">
+							<div class="row">
+								<div class="col-md-12 form-it">
+									<label>Celebrity name</label>
+									<input type="text" id="actorNameList" name="searchNameList" placeholder="Enter keywords" value="@ViewBag.SearchNameList">
+								</div>
+								<div class="col-md-12 form-it">
+									<label>Role</label>
+									<select name="searchRoleList" id="actorRoleList">
+										<option value="" onselect="">---------- Select Role ----------</option>
+										<option value="Actor">Actor</option>
+										<option value="Director">Director</option>
+									</select>
+								</div>						
+								<div class="col-md-12 " style="margin-bottom:10px">
+									<input class="submit" type="submit" value="submit">
+								</div>
+								<div class="col-md-12 ">
+									<input class="submit" onclick="ResetForm()" style="background-color: #dcf836" type="button" value="reset">
+								</div>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+	function ResetForm() {
+		$("#actorNameList").val("");
+		$("#actorRoleList").val("");
+	}
+	function changePageSize() {
+		var pageSizeList = document.getElementById("pageSizeList").value;
+		var keyword = '@ViewBag.SearchNameList';
+		window.location.href = '@Url.Action("IndexList")' + "?pageSizeList=" + pageSizeList;
+	} 
+	function applySortOrder() {
+		var sortOrder = document.getElementById("sortOrderList").value;
+		var form = document.getElementById("sortFormList");
+		form.action = '@Url.Action("IndexList", "HomeActor")';
+		form.submit();
+	}
+</script>

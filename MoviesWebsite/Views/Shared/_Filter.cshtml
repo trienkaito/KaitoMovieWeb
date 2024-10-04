@@ -1,0 +1,98 @@
+﻿@using static MoviesWebsite.Controllers.ViewMoviesController
+@model ViewCategory
+
+@{
+	var categories = ViewData["Categories"] as MultiSelectList;
+	var actors = ViewData["Actors"] as MultiSelectList;
+	var directors = ViewData["Directors"] as SelectList;
+	var fromYear = ViewData["FromYear"] as SelectList;
+}
+
+<form class="form-style-1" id="form-filter" method="get" asp-action="Index">
+	<div class="row">
+		<div class="col-md-12 form-it" hidden>
+			<input asp-for="SearchString" hidden type="text" placeholder="Enter keywords">
+		</div>
+		<div class="col-md-12 form-it">
+			<label asp-for="Categories"></label>
+			<div class="group-ip">
+				<select multiple="" asp-for="Categories" id="Categories" asp-items="@categories"
+						class="ui fluid dropdown">
+					<option disabled value="">
+						-- Select @Html.DisplayNameFor(m => m.Categories)
+						--
+					</option>
+				</select>
+			</div>
+		</div>
+		<div class="col-md-12 form-it">
+			<label asp-for="Director"></label>
+			<select asp-for="Director" id="Director" class="fluid dropdown" asp-items="@directors">
+				<option selected value="">
+					-- Select @Html.DisplayNameFor(m => m.Director)--
+				</option>
+			</select>
+		</div>
+		<div class="col-md-12 form-it">
+			<label asp-for="Actor"></label>
+			<div class="group-ip">
+				<select asp-for="Actor" id="Actor" asp-items="@actors" class="ui fluid dropdown">
+					<option disabled value="">
+						-- Select @Html.DisplayNameFor(m => m.Actor)--
+					</option>
+				</select>
+			</div>
+
+		</div>
+		<div class="col-md-12 form-it">
+			<label asp-for="FromYear"></label>
+			<div class="row">
+				<div class="col-md-6 ">
+					<select asp-for="FromYear" id="select-from-year" asp-items="@fromYear"
+							class="fluid dropdown">
+						<option selected value="">From</option>
+					</select>
+				</div>
+				<div id="to-year">
+					<partial name="_ToYear" />
+				</div>
+			</div>
+		</div>
+		<div class="col-md-12 form-it" hidden>
+			<input id="sort-by-form" hidden asp-for="SortBy" />
+		</div>
+		<div class="col-md-12 form-it" hidden>
+			<input id="view-form" hidden asp-for="View" />
+		</div>
+		<div class="col-md-12 form-it" hidden>
+			<input id="page-size" hidden asp-for="PageSize" />
+		</div>
+
+		<div class="row">
+			<div class="col-md-12 " style="margin-bottom:10px">
+				<input class="submit" type="submit" value="submit">
+			</div>
+			<div class="col-md-12 ">
+				<input class="submit" onclick="ResetForm()" style="background-color: #dcf836" type="button" value="reset">
+			</div>
+		</div>
+	</div>
+</form>
+
+<script>
+	function ResetForm() {
+		$("#Categories").val("");
+		$("#Categories").siblings("a").remove();
+
+		$("#Director").val("");
+		$("#Actor").val("");
+		$("#Actor").siblings("a").remove();
+
+		$("#select-from-year").val("");
+		$("#select-to-year").val("");
+
+		$("#select-to-year").prop("disabled", true);
+
+		$("#form-filter").submit();
+	}
+</script>

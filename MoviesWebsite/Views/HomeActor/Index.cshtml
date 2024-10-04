@@ -1,0 +1,201 @@
+﻿@model IEnumerable<MoviesWebsite.Models.Movie.Actor>
+
+<div class="hero common-hero">
+	<div class="container">
+		<div class="row">
+			<div class="col-md-12">
+				<div class="hero-ct">
+					<h1>celebrity listing - grid</h1>
+					<ul class="breadcumb">
+						<li class="active"><a asp-action="Index" asp-controller="Home">Home</a></li>
+						<li> <span class="ion-ios-arrow-right"></span> celebrity listing</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- celebrity grid v2 section-->
+<div class="page-single">
+	<div class="container">
+		<div class="row ipad-width2">
+			<div class="col-md-9 col-sm-12 col-xs-12">
+				<div class="topbar-filter">
+					<p class="pad-change">Found <span>@Model.Count() celebrities</span> in total</p>
+					<label>Sort by:</label>
+					<form id="sortForm" asp-action="Index" method="get">
+						<input type="hidden" name="currentPage" value="@ViewBag.CurrentPage" />
+						<input type="hidden" name="pageSize" value="@ViewBag.PageSize" />
+
+						<select id="sortOrder" name="sortOrder" class="form-control" onchange="applySortOrder()">
+							@if (ViewBag.SortOrder == "name_desc")
+							{
+								<option value="name_desc" selected>Name Descending</option>
+								<option value="name_asc">Name Ascending</option>
+							}
+							else
+							{
+								<option value="name_desc">Name Descending</option>
+								<option value="name_asc" selected>Name Ascending</option>
+							}
+						</select>
+					</form>
+					<a asp-action="IndexList" asp-controller="HomeActor" class="list"
+					   asp-route-currentPageList="@ViewBag.CurrentPage"
+					   asp-route-pageSizeList="@ViewBag.PageSize"
+					   asp-route-searchNameList="@ViewBag.SearchName"
+					   asp-route-searchRoleList="@ViewBag.SearchRole"
+					   asp-route-sortOrderList="@ViewBag.SortOrder">
+						<i class="ion-ios-list-outline"></i>
+					</a>
+					<a asp-action="Index" asp-controller="HomeActor" class="grid"
+					   asp-route-currentPage="@ViewBag.CurrentPage"
+					   asp-route-pageSize="@ViewBag.PageSize"
+					   asp-route-searchName="@ViewBag.SearchName"
+					   asp-route-searchRole="@ViewBag.SearchRole"
+					   asp-route-sortOrder="@ViewBag.SortOrder">
+						<i class="ion-grid "></i>
+					</a>
+				</div>
+
+				<div class="row py-3 my-2">
+					@if (Model.Any())
+					{
+						<div class="row">
+							@foreach (var item in Model)
+							{
+								<div class="col-lg-4 col-md-6">
+									<div class="ceb-item-style-2 d-flex flex-column w-100 py-2" style="padding: 10px">
+										@if (!string.IsNullOrEmpty(item.Image))
+										{
+											<img src="@item.Image" width="70px" style="object-fit: cover;" alt="..." />
+										}
+										else
+										{
+											<span>
+												<img src="/contents/avata.jpg" width="70px" style="object-fit: cover;" alt="..." />
+											</span>
+										}
+										<div class="ceb-infor mt-3">
+											<h2>
+												<a onclick="window.location.href='@Url.Action("Details", "HomeActor", new { id = item.ActorId })';"
+												   style="cursor: pointer">@item.Name</a>
+											</h2>
+											<span>@item.Role</span>
+										</div>
+									</div>
+								</div>
+							}
+						</div>
+					}
+					else
+					{
+						<p class="text-danger font-weight-bold fs-25" style="color: #EF5A6F; font-weight: bold">No actors found.</p>
+					}
+				</div>
+
+				@if (Model.Any())
+				{
+					<div class="topbar-filter">
+						<label>Reviews per page:</label>
+						<select class="form-select" w-auto id="pageSize" onchange="changePageSize()">
+							<option value="" disabled selected>Choose number of actors</option>
+							@for (int i = 0; i <= ViewBag.TotalActors && i <= 50; i += 5)
+							{
+								if ((int)ViewBag.PageSize == (i + 5))
+								{
+									<option selected value="@(i + 5)">@(i + 5)</option>
+								}
+								else
+								{
+									<option value="@(i + 5)">@(i + 5)</option>
+								}
+							}
+						</select>
+
+						<div class="pagination2">
+							<span>Page @ViewBag.CurrentPage of @ViewBag.PageCount</span>
+
+							<!-- Ẩn nút Previous nếu đang ở trang đầu -->
+							@if (ViewBag.CurrentPage > 1)
+							{
+								<a href="@Url.Action("Index", new { currentPage = ViewBag.CurrentPage - 1, pageSize = ViewBag.PageSize, searchName = ViewBag.SearchName, searchRole = ViewBag.SearchRole, sortOrder = ViewBag.SortOrder })">
+									<i class="ion-arrow-left-b"></i>
+								</a>
+							}
+
+							<!-- Hiển thị các số trang -->
+							@for (int i = 1; i <= ViewBag.PageCount; i++)
+							{
+								if (i == ViewBag.CurrentPage)
+								{
+									<a class="active" href="#">@i</a>
+								}
+								else
+								{
+									<a href="@Url.Action("Index", new { currentPage = i, pageSize = ViewBag.PageSize, searchName = ViewBag.SearchName, searchRole = ViewBag.SearchRole, sortOrder = ViewBag.SortOrder })">@i</a>
+								}
+							}
+
+							<!-- Ẩn nút Next nếu đang ở trang cuối -->
+							@if (ViewBag.CurrentPage < ViewBag.PageCount)
+							{
+								<a href="@Url.Action("Index", new { currentPage = ViewBag.CurrentPage + 1, pageSize = ViewBag.PageSize, searchName = ViewBag.SearchName, searchRole = ViewBag.SearchRole, sortOrder = ViewBag.SortOrder })">
+									<i class="ion-arrow-right-b"></i>
+								</a>
+							}
+						</div>
+					</div>
+				}
+			</div>
+			<div class="col-md-3 col-xs-12 col-sm-12">
+				<div class="sidebar">
+					<div class="searh-form">
+						<h4 class="sb-title">Filter celebrity</h4>
+						<form class="form-style-1 celebrity-form" asp-action="Index" method="get">
+							<div class="row">
+								<div class="col-md-12 form-it">
+									<label>Celebrity name</label>
+									<input type="text" id="actorName" name="searchName" placeholder="Enter keywords" value="@ViewBag.SearchName">
+								</div>
+								<div class="col-md-12 form-it">
+									<label>Role</label>
+									<select name="searchRole" id="actorRole">
+										<option value="" onselect="">---------- Select Role ----------</option>
+										<option value="Actor">Actor</option>
+										<option value="Director">Director</option>
+									</select>
+								</div>
+								<div class="col-md-12 " style="margin-bottom:10px">
+									<input class="submit" type="submit" value="submit">
+								</div>
+								<div class="col-md-12 ">
+									<input class="submit" onclick="ResetForm()" style="background-color: #dcf836" type="button" value="reset">
+								</div>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+	function ResetForm() {
+		$("#actorName").val("");
+		$("#actorRole").val("");
+	}
+	function changePageSize() {
+		var pageSize = document.getElementById("pageSize").value;
+		var keyword = '@ViewBag.SearchName';
+		window.location.href = '@Url.Action("Index")' + "?pageSize=" + pageSize;
+	}
+	function applySortOrder() {
+		var sortOrder = document.getElementById("sortOrder").value;
+		var form = document.getElementById("sortForm");
+		form.action = '@Url.Action("Index", "HomeActor")';
+		form.submit();
+	}
+</script>

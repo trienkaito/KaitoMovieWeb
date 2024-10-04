@@ -1,0 +1,21 @@
+﻿@model SendCodeViewModel
+@{
+    ViewData["Title"] = "Send code";
+}
+
+<h1>@ViewData["Title"].</h1>
+
+<form asp-controller="Account" asp-action="SendCode" asp-route-returnurl="@Model.ReturnUrl" method="post" class="form-horizontal" role="form">
+    <input asp-for="RememberMe" type="hidden" />
+    <div class="row">
+        <div class="col-md-8">
+            Verify code have send to:
+            <select asp-for="SelectedProvider" asp-items="Model.Providers"></select>
+            <button type="submit" class="btn btn-success btn-sm">send</button>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+}

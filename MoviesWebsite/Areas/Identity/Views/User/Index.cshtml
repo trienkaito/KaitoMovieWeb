@@ -1,0 +1,117 @@
+@using MoviesWebsite.Data
+@using Microsoft.AspNetCore.Identity;
+@model UserListModel
+@inject UserManager<AppUser> _userManager
+@inject AdminSidebarService _AdminSidebarService
+@{
+    ViewData["Title"] = "List of user";
+
+}
+<partial name="_StatusMessage"></partial>
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <div class="d-flex">
+            <div class="" style="flex: 1">
+                <p>Sum ammount of user: @Model.totalUsers</p>
+            </div>
+            <form asp-action="Index" method="get">
+                <div class="input-group ml-3" style="flex: 1">
+                    <input type="text" name="searchString" class="form-control bg-light border-0 small"
+                           placeholder="Search for..." value="@ViewData["searchString"]" aria-label="Search"
+                           aria-describedby="basic-addon2" />
+                    <div class="input-group-append">
+                        <button class="btn btn-primary" type="submit">
+                            <i class="fas fa-search fa-sm"></i>
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>User name</th>
+                        <th>Role</th>
+                        <th>Function</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var user in Model.users)
+                    {
+                        <tr>
+                            <td>@user.UserName</td>
+                            <td>
+                                @if (string.IsNullOrEmpty(user.RoleNames))
+                                {
+                                    <a asp-action="AddRole" asp-route-id="@user.Id">+ Add roles</a>
+                                }
+                                else
+                                {
+                                    if (user.UserName != "admin")
+                                    {
+                                        <a asp-action="AddRole" asp-route-id="@user.Id">@user.RoleNames</a>
+                                    }
+                                    else
+                                    {
+                                        <a class="text-dark" href="#">@user.RoleNames</a>
+                                    }
+                                }
+                            </td>
+                            <td>
+                                <a class="btn btn-success btn-sm" asp-action="SetPassword" asp-route-id="@user.Id">Set password</a>
+                                @if (user.UserName != "admin")
+                                {
+                                    var u = _userManager.Users.FirstOrDefault(_ => _.Id == user.Id);
+                                    var endLock = await _userManager.GetLockoutEndDateAsync(u);
+                                    if (endLock == null || endLock < DateTimeOffset.Now)
+                                    {
+                                        <a asp-action="LockUser"
+                                            asp-route-id="@user.Id"
+                                            class="btn btn-danger btn-sm">
+                                            Ban
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <a asp-action="UnLockUser"
+                                           asp-route-id="@user.Id"
+                                           class="btn btn-warning btn-sm">
+                                            Unban
+                                        </a>
+                                    }
+
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+        </div>
+    </div>
+</div>
+    @{
+        var pagingmodel = new PagingModel()
+            {
+                currentpage = Model.currentPage,
+                countpages = Model.countPages,
+                generateUrl = (int? p) => Url.Action("Index", new { p = p, searchString = ViewData["searchString"] })
+            };
+    }
+    <div class="float-right">
+        <partial name="_PagingXTL" model="@pagingmodel" />
+    </div>
+
+
+    @{
+        _AdminSidebarService.SetActive("User", "Index", "Identity");
+    }
+
+    @section Sidebar
+    {
+        @Html.Raw(_AdminSidebarService.renderHtml())
+    }

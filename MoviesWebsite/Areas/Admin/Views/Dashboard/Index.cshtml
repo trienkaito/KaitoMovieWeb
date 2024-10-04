@@ -1,0 +1,307 @@
+﻿@using MoviesWebsite.Data
+@using Newtonsoft.Json
+@{
+    ViewData["Title"] = "Dashboard";
+}
+@inject AdminSidebarService _AdminSidebarService
+<div class="row">
+    <!-- Earnings (Monthly) Card Example -->
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-primary shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                            Movie
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">
+                            <p id="counter1">0</p>
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-film fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Earnings (Monthly) Card Example -->
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-success shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                            Category
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">
+                            <p id="counter2">0</p>
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-list fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Earnings (Monthly) Card Example -->
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-info shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                            Actor
+                        </div>
+                        <div class="row no-gutters align-items-center">
+                            <div class="col-auto">
+                                <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800">
+                                    <p id="counter3">0</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-users fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pending Requests Card Example -->
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-warning shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                            Comment
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">
+                            <p id="counter4">0</p>
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-comments fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <!-- Area Chart -->
+
+    <div class="col-xl-8 col-lg-6">
+@*         <h6 class="m-0 font-weight-bold text-primary">
+            Earnings Overview
+        </h6>        
+        <div class="chart-area">
+            <canvas id="myAreaChart" width="400" height="200"></canvas>
+        </div> *@
+        <div class="card shadow mb-4">
+            <!-- Card Header - Dropdown -->
+            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    Earnings Overview
+                </h6>
+            </div>
+            <!-- Card Body -->
+            <div class="card-body">
+                <div class="chart-area">
+                    <canvas id="myAreaChart" width="400" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pie Chart -->
+    <div class="col-xl-4 col-lg-6">
+        <div class="card shadow mb-4">
+            <!-- Card Header - Dropdown -->
+            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    Revenue Sources
+                </h6>
+                <div class="dropdown no-arrow">
+                    <a class="dropdown-toggle"
+                       href="#"
+                       role="button"
+                       id="dropdownMenuLink"
+                       data-toggle="dropdown"
+                       aria-haspopup="true"
+                       aria-expanded="false">
+                        <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in"
+                         aria-labelledby="dropdownMenuLink">
+                        <div class="dropdown-header">Dropdown Header:</div>
+                        <a class="dropdown-item" href="#">Action</a>
+                        <a class="dropdown-item" href="#">Another action</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="#">Something else here</a>
+                    </div>
+                </div>
+            </div>
+            <!-- Card Body -->
+            <div class="card-body">
+                <div class="chart-pie pt-4 pb-2">
+                    <canvas id="myDonutChart" width="400" height="400"></canvas>
+                </div>
+                <div class="mt-4 text-center small">
+                    <span class="mr-2">
+                        @* <i class="fas fa-circle text-primary"></i> Movie *@
+                    </span>
+                    <span class="mr-2">
+                        @* <i class="fas fa-circle text-success"></i> Category *@
+                    </span>
+                    <span class="mr-2">
+                        @* <i class="fas fa-circle text-info"></i> Actor *@
+                    </span>
+                    <span class="mr-2">
+                        @* <i class="fas fa-circle text-danger"></i> Comments *@
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts
+{
+    <partial name="_ValidationScriptsPartial" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            let countUpOptions = {
+                useEasing: true,
+                useGrouping: true,
+                separator: ",",
+                decimal: ".",
+            };
+
+            var movies = parseInt(@ViewData["Movies"]);
+            var categories = parseInt(@ViewData["Categories"]);
+            var actors = parseInt(@ViewData["Actors"]);
+            var comments = parseInt(@ViewData["Comments"]);
+            
+
+            let movie = new CountUp("counter1", 0, movies, 0, 2.5, countUpOptions);
+            if (!movie.error) {
+                movie.start();
+            } else {
+                console.error(movie.error);
+            }
+
+            let category = new CountUp("counter2", 0, categories, 0, 2.5, countUpOptions);
+            if (!category.error) {
+                category.start();
+            } else {
+                console.error(category.error);
+            }
+
+            let actor = new CountUp("counter3", 0, actors, 0, 2.5, countUpOptions);
+            if (!actor.error) {
+                actor.start();
+            } else {
+                console.error(actor.error);
+            }
+
+            let comment = new CountUp("counter4", 0, comments, 0, 2.5, countUpOptions);
+            if (!comment.error) {
+                comment.start();
+            } else {
+                console.error(comment.error);
+            }
+
+            var sum = (movies + categories + actors + comments)
+            var rateMovie = movies / sum * 100
+            var rateCategory = categories / sum * 100
+            var rateActor = actors / sum * 100
+            var rateComment = comments / sum * 100
+
+            const ctx = document.getElementById('myDonutChart').getContext('2d');
+            const ctx1 = document.getElementById('myAreaChart').getContext('2d');
+
+            const movieTitles = @Html.Raw(JsonConvert.SerializeObject(ViewData["MoviesTitle"]));
+            const movieViews = @Html.Raw(JsonConvert.SerializeObject(ViewData["MoviesView"]));
+
+            const areaData = {
+                labels: movieTitles,
+                datasets: [{
+                    label: 'Movies',
+                    backgroundColor: 'rgba(76, 175, 80, 0.2)',
+                    borderColor: 'rgba(0, 188, 212, 0.2)',
+                    borderWidth: 2,
+                    hoverBackgroundColor: 'rgba(76, 175, 80, 0.6)',
+                    hoverBorderColor: 'rgba(0, 188, 212, 0.2)',
+                    data: movieViews
+                }]
+            };
+
+            const areaOptions = {
+                responsive: true,
+                maintainAspectRatio: false
+            };
+
+            var areaChart = new Chart(ctx1, {
+                type: 'bar',
+                data: areaData,
+                optons: areaOptions
+            });
+
+            const donutData = {
+                labels: ['Movie', 'Category', 'Actor','Comment'],
+                datasets: [{
+                    label: 'My Movie Chart',
+                    data: [rateMovie, rateCategory, rateActor, rateComment],
+                    backgroundColor: [
+                        'rgba(76, 175, 80, 0.2)',  // Green
+                        'rgba(0, 188, 212, 0.2)',  // Cyan
+                        'rgba(63, 81, 181, 0.2)',  // Blue
+                        'rgba(255, 99, 132, 0.2)'  // Red (the new color)
+                    ],
+                    borderColor: [
+                        'rgba(76, 175, 80, 1)',  // Green
+                        'rgba(0, 188, 212, 1)',  // Cyan
+                        'rgba(63, 81, 181, 1)',  // Blue
+                        'rgba(255, 99, 132, 1)'  // Red (the new color)
+                    ],
+                    borderWidth: 1
+                }]
+            };
+
+            const donutOptions = {
+                responsive: true,
+                maintainAspectRatio: false
+            };
+
+            const donutChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: donutData,
+                options: donutOptions
+            });
+
+        });
+    </script>
+}
+
+@{
+    var user = await _userManager.GetUserAsync(this.User);
+    var hidden = true;
+    if (user != null)
+    {
+        var roles = await _userManager.GetRolesAsync(user);
+        hidden = !roles.Any(r => r == RoleName.Administrator);
+    }
+    _AdminSidebarService.SetActive("Dashboard", "Index", "Admin",hidden);
+}
+
+@section Sidebar
+{
+    @Html.Raw(_AdminSidebarService.renderHtml())
+}

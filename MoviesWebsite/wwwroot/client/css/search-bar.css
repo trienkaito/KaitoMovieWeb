@@ -1,0 +1,137 @@
+﻿
+.loader {
+    width: 50px;
+    aspect-ratio: 1;
+    display: grid;
+    border: 4px solid #0000;
+    border-radius: 50%;
+    border-color: #ccc #0000;
+    animation: l16 1s infinite linear;
+}
+
+    .loader::before,
+    .loader::after {
+        content: "";
+        grid-area: 1/1;
+        margin: 2px;
+        border: inherit;
+        border-radius: 50%;
+    }
+
+    .loader::before {
+        border-color: #f03355 #0000;
+        animation: inherit;
+        animation-duration: .5s;
+        animation-direction: reverse;
+    }
+
+    .loader::after {
+        margin: 8px;
+    }
+
+@keyframes l16 {
+    100% {
+        transform: rotate(1turn)
+    }
+}
+
+.search-container {
+    width: 100%;
+    position: relative;
+    display: inline-block;
+}
+
+.search-loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.search-results {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    width: 40%; 
+    transform: translateX(-50%); 
+    background-color: #2e3b55; 
+    max-height: 300px;
+    overflow-y: auto;
+    border-radius: 8px;
+    z-index: 9999;
+    display: none; 
+    padding: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.search-container:focus-within .search-results {
+    display: block;
+}
+
+.search-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+    text-decoration: none;
+    color: #fff; 
+}
+
+.search-item:hover {
+    background-color: #3c4b6e; 
+    border-radius: 8px;
+    padding: 5px;
+}
+
+.search-img {
+    width: 50px;
+    height: 75px;
+    object-fit: cover;
+    margin-right: 10px;
+    border-radius: 4px;
+}
+
+.mv-item-infor h6 {
+    font-size: 18px;
+    margin: 0;
+}
+::-webkit-scrollbar {
+    width: 0px;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background: rgba(136, 136, 136, 0.281);
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    background: #555;
+  }
+  
+/* .search-bar {
+    display: flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+}
+
+.search-result {
+    margin-top:0;
+    border-radius:25px;
+    background-color: #233a50;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: start;
+}
+
+.search-item {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    padding: 15px
+}
+
+.search-img {
+    height:100px;
+    object-fit:cover;
+} */

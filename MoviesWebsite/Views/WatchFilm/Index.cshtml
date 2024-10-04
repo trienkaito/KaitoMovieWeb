@@ -1,0 +1,166 @@
+﻿@model MoviesWebsite.Controllers.WatchFilmController.WatchMovie
+@using Microsoft.AspNetCore.Authorization
+@inject IAuthorizationService authorization
+@{
+    ViewData["Title"] = "Watch Film";
+    var link = Model.Link;
+    var userId = ViewBag.UserId;
+    var result = await authorization.AuthorizeAsync(this.User, "Vip");
+    var isAuthorized = result.Succeeded ? "true" : "false";
+}
+
+<div class="hero mv-single-hero">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12"></div>
+        </div>
+    </div>
+</div>
+
+<div class="page-single movie-single movie_single">
+    <div class="container">
+        <div class="row ipad-width2" style="margin-left: 0 !important; margin-right: 0 !important">
+            <div class="col-md-12 col-sm-12 col-xs-12">
+                @* <div class="movie-img">
+                <!-- Display the advertisement video -->
+                <video id='ad-video' class="video-js vjs-default-skin" width="1080px" controls>
+                <source type="video/mp4"
+                src="https://res.cloudinary.com/ddemtqw8t/video/upload/v1725954348/fhm8bxqou97os8mo2bcm.mp4">
+                </video>
+                <!-- Display the main video -->
+                <video id='hls-example' class="video-js vjs-default-skin" width="1080px" controls >
+                <source type="application/x-mpegURL" src="@link">
+                </video>
+                <!-- Skip button -->
+                <button id="skip-button" onclick="SkipAd()" disabled style="display: block;
+                position: absolute;
+                top: 500px;
+                height: 39px;
+                width: 173px;
+                right: 53px;">Skip Ad</button>
+                </div> *@
+                <div class="movie-img">
+                    <!-- Display the advertisement video -->
+                    <video id='ad-video' class="video-js vjs-default-skin" width="1080px" controls>
+                        <source type="application/x-mpegURL"
+                                src="https://res.cloudinary.com/ddemtqw8t/video/upload/v1727227440/d2oaexkztiu4lnj5bswh.m3u8">
+                    </video>
+
+                    <!-- Display the main video -->
+                    <video id='hls-example' class="video-js vjs-default-skin" width="1080px" controls>
+                        <source type="application/x-mpegURL" src="@link">
+                    </video>
+
+                    <!-- Skip button -->
+                    <button id="skip-button" onclick="SkipAd()" disabled
+                        style="display: block; position: absolute; top: 500px; height: 39px; width: 173px; right: 53px;">Skip
+                        Ad</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-12 col-sm-12 col-xs-12">
+            <div class="row">
+                <div class="col-xs-12">
+                    <div style="display: flex; flex-wrap: wrap; gap: 5px;">
+                        @foreach (var episode in Model.Movie.Episodes)
+                        {
+                            // Cắt phần tên phim khỏi title của tập
+                            var episodeNumber = episode.Title.Replace(@Model.Movie.Title, "").Trim();
+
+                                <form asp-action="ChangeEpisode" asp-controller="WatchFilm" asp-area="" method="post"
+                                    style="display: inline;">
+                                    <input type="hidden" name="slug" value="@episode.Slug" />
+                                    <button type="submit" class="episode-btn">@episodeNumber</button>
+                                </form>
+                        }
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <br />
+
+        <!-- Movie description and comment section -->
+        <div class="row ipad-width2" style="margin-left: 0 !important; margin-right: 0 !important; margin-top: 50px">
+            <div class="col-md-12 col-sm-12 col-xs-12">
+                <div class="movie-single-ct main-content">
+                    <h1 class="bd-hd">@Model.Movie.Title - @Model.Movie.ReleaseDate?.Year</h1>
+                    <p>@Model.Movie.Description</p>
+
+                    <!-- Comments Section -->
+                    @Html.Partial("_CommentsSection", Model.Movie)
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- JS code -->
+<!-- If you'd like to support IE8 (for Video.js versions prior to v7) -->
+<script src="https://vjs.zencdn.net/ie8/ie8-version/videojs-ie8.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/videojs-contrib-hls/5.14.1/videojs-contrib-hls.js"></script>
+<script src="https://vjs.zencdn.net/7.2.3/video.js"></script>
+
+<script>
+    // Nhận giá trị từ Razor về quyền của người dùng
+    var isAuthorized = @Html.Raw(isAuthorized);
+
+
+    var adVideo = videojs('ad-video');
+    var mainVideo = videojs('hls-example');
+    var skipButton = document.getElementById('skip-button');
+    if (isAuthorized) {
+            console.log('User is not authorized to watch the main video', isAuthorized);
+
+        document.getElementById('ad-video').style.display = 'none'; // Ẩn video quảng cáo
+        skipButton.style.display = 'none'; // Ẩn nút Skip
+        mainVideo.play();
+    }
+
+    // Nếu người dùng không có quyền, hiển thị quảng cáo
+    if (!isAuthorized) {
+        var hs = document.getElementById('hls-example');
+        hs.style.display = 'none';  // Ẩn video chính ban đầu
+        adVideo.play();  // Chạy quảng cáo
+
+        // Hiển thị nút bỏ qua sau 5 giây
+        function enableSkipButton() {
+            var countdown = 5; // 5 seconds countdown
+            var interval = setInterval(function () {
+                if (countdown > 0) {
+                    skipButton.innerText = 'Skip Ad (' + countdown + 's)';
+                    countdown--;
+                } else {
+                    clearInterval(interval);
+                    skipButton.innerText = 'Skip Ad';
+                    skipButton.disabled = false;
+                }
+            }, 1000); // 1 second interval
+        }
+
+        // Gọi hàm để bắt đầu đếm ngược
+        enableSkipButton();
+
+        // Bỏ qua quảng cáo và phát video chính
+        function SkipAd() { 
+            skipButton.style.display = 'none';
+            adVideo.pause();
+            adVideo.hide();
+            mainVideo.show();
+            document.getElementById('hls-example').style.display = 'block';
+            mainVideo.play();
+        }
+
+        // Tự động phát video chính sau khi quảng cáo kết thúc
+        adVideo.on('ended', function () {
+            mainVideo.show();
+            mainVideo.play();
+        });
+    }
+    else {
+        // Nếu người dùng có quyền, phát video chính ngay lập tức
+        // Chạy video chính ngay lập tức
+    }
+</script>

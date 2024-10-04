@@ -1,0 +1,124 @@
+﻿@model MoviesWebsite.Models.Movie.ActorViewModel
+
+<div class="modal fade" id="editActor" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content" style="width: 700px">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Actor</h5>
+                <button class="close"
+                        type="button"
+                        data-bs-dismiss="modal"
+                        aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form method="post" asp-area="Admin" asp-controller="Actor" asp-action="Edit" asp-route-id="@Model.Actor.ActorId" id="editActorForm" enctype="multipart/form-data">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <input type="hidden" asp-for="Actor.ActorId" />
+
+                    <div class="form-group">
+                        <label asp-for="Actor.Name" class="control-label"></label>
+                        <input asp-for="Actor.Name" class="form-control" id="nameEdit" />
+                        <span asp-validation-for="Actor.Name" class="text-danger" id="actorNameErrorEdit"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="Actor.Role" class="control-label"></label>
+                        <select asp-for="Actor.Role" class="form-control" id="actorRoleEdit" asp-items="@Model.Roles" class="form-select">
+                            <option disabled onselect="">-- Select Actor --</option>
+                        </select>
+                        <span asp-validation-for="Actor.Role" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="Actor.Image" class="control-label"></label>
+                        <input asp-for="Actor.Image" class="form-control" id="image" name="files" type="file" />
+                        <span asp-validation-for="Actor.Image" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group" id="previewContainer">
+                        @if (!string.IsNullOrEmpty(Model.imgUrl))
+                        {
+                            <img id="selectedImagePreview" src="@Model.imgUrl" alt="Selected Image" style="max-width:25%; height:auto; margin-top:10px;" />
+                        } 
+                        else
+                        {
+                            <img id="selectedImagePreview" src="/contents/avata.jpg" alt="Selected Image" style="max-width:25%; height:auto; margin-top:10px;" />
+                        }
+
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button class="btn btn-warning" onclick="CheckExitActor(@Model.Actor.ActorId)" type="button">Save</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<partial name="_ValidationScriptsPartial" />
+
+<script>
+    $(document).ready(function () {
+        console.log("a");
+        $(document).on('change', '#image', function (event) {
+            console.log("abc");
+            const [file] = event.target.files;
+            const previewContainer = document.getElementById('previewContainer');
+
+            // Xóa tất cả thẻ img bên trong container trước khi chèn thẻ mới
+            while (previewContainer.firstChild) {
+                previewContainer.removeChild(previewContainer.firstChild);
+            }
+
+            if (file) {
+                const fileURL = URL.createObjectURL(file);
+                console.log('File URL:', fileURL); // Kiểm tra URL của ảnh
+
+                // Tạo thẻ img mới và chèn vào container
+                const newImg = document.createElement('img');
+                newImg.id = 'selectedImagePreview';
+                newImg.src = fileURL;
+                newImg.alt = 'Selected Image';
+                newImg.style.maxWidth = '25%';
+                newImg.style.height = 'auto';
+                newImg.style.marginTop = '10px';
+
+                // Thêm thẻ img mới vào container
+                previewContainer.appendChild(newImg);
+            }
+        });
+    });
+</script>
+
+<script>
+    function CheckExitActor(id) {
+        var name = $("#nameEdit").val().trim();
+        var role = $('#actorRoleEdit').val();
+
+        if (name && role) {
+            $.ajax({
+                url: '@Url.Action("IsActorUpdateExists", "Actor")',
+                type: 'GET',
+                data: { name: name, role: role, id: id },
+                success: function (response) {
+                    if (response) {
+                        $('#actorNameErrorEdit').text('Actor already exists in the system. Please try again!');
+                    } else {
+                        $('#actorNameErrorEdit').text('');
+                        $('#editActorForm').submit();
+                    }
+                },
+                error: function () {
+                    console.log("An error occurred while checking actor name.");
+                }
+            });
+        } else {
+            $('#actorNameErrorEdit').text('Name is required.');
+        }
+    }
+</script>
+

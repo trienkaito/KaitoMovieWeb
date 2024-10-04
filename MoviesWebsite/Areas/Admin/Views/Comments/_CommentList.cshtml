@@ -1,0 +1,50 @@
+﻿@using MVC.Menu
+@using Microsoft.AspNetCore.Identity
+
+@inject UserManager<AppUser> UserManager
+@model List<MoviesWebsite.Models.Movie.Comment>
+
+@foreach (var comment in Model)
+{
+    <div class="row mt-2" id="comment-@comment.CommentId">
+        <div class="">
+            @{
+                string imgurl = "";
+                if (!string.IsNullOrWhiteSpace(comment.User.Avatar))
+                {
+                    imgurl = comment.User.Avatar;
+                }
+                else
+                {
+                    imgurl = "/contents/avata.jpg";
+                }
+            }
+            <img src="@imgurl"
+                 alt="..." class="img-thumbnail" style="width: 70px; height: 70px" />
+        </div>
+        <div class="col-10">
+            <div class="d-flex justify-content-between">
+                <div>
+                    <h5 class="text-info">@comment.User.UserName</h5>
+                    <p id="comment-content-@comment.CommentId">@comment.Content</p>
+                    <input type="text" id="edit-content-@comment.CommentId" value="@comment.Content" class="form-control d-none" />
+                </div>
+                <div>
+                    <div class="dropdown">
+                        <i class="fas fa-ellipsis-v" style="cursor: pointer" data-bs-toggle="dropdown"></i>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#" onclick="editComment('@comment.CommentId')">Edit</a></li>
+                            <li>
+                                <a class="dropdown-item" href="#" onclick="deleteComment('@comment.CommentId')">Delete</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-2 d-none" id="edit-buttons-@comment.CommentId">
+                <button class="btn btn-secondary" onclick="cancelEdit('@comment.CommentId')">Cancel</button>
+                <button class="btn btn-primary" onclick="updateComment('@comment.CommentId')">Update</button>
+            </div>
+        </div>
+    </div>
+}

@@ -1,0 +1,90 @@
+﻿@using static MoviesWebsite.Controllers.HistoriesController
+@model ViewHistory
+
+@{
+	ViewData["Title"] = "Histories";
+	Layout = "~/Views/Shared/_Layout.cshtml";
+	var filterBy = ViewData["FilterBy"] as SelectList;
+	var moviesPerPages = ViewData["MoviesPerPages"] as SelectList;
+}
+
+<div class="page-single">
+	<div class="container" style="padding: 0 !important;">
+		<div class="row ipad-width">
+			<div class="col-md-12 col-sm-12 col-xs-12">
+				<div class="topbar-filter">
+					<p>Found <span>@Model.Histories.Count log</span> in total</p>
+					<label asp-for="FilterBy"></label>
+					<select asp-for="FilterBy" id="select-sort-by" asp-items="@filterBy">
+					</select>
+					<a id="view-list" href="#" class="list"><i class="ion-ios-list-outline active"></i></a>
+
+				</div>
+
+					<partial name="_ListMoviesHistory" model="@Model" />
+
+
+				<div class="topbar-filter">
+					<label asp-for="PageSize"></label>
+					<select asp-for="PageSize" id="select-page-size" asp-items="@moviesPerPages">
+					</select>
+					<partial name="_PagingXTLClient" model="@ViewBag.pagingmodel" />
+				</div>
+			</div>
+			<div class="col-md-12 col-sm-12 col-xs-12" hidden>
+				<div class="sidebar">
+					<div class="search-form">
+						<h4 class="sb-title">Search for movie</h4>
+						<form class="form-style-1" id="form-filter" method="get" asp-action="Index">
+							<div class="row">
+								<div class="col-md-12 form-it" hidden>
+									<input id="sort-by-form" hidden asp-for="FilterBy" />
+								</div>
+								<div class="col-md-12 form-it" hidden>
+									<input id="page-size" hidden asp-for="PageSize" />
+								</div>
+
+								<div class="col-md-12 ">
+									<input class="submit" type="submit" value="submit">
+								</div>
+							</div>
+						</form>
+					</div>
+
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+@section Scripts {
+	<script>
+
+
+		$("document").ready(function () {
+			console.log("Ready");
+			$("#select-page-size").change(PageSizeChange);
+			$("#select-sort-by").change(SortByChange);
+		});
+
+
+		function SubmitForm() {
+			$("#form-filter").submit();
+		}
+
+		function PageSizeChange() {
+			$("#page-size").val($("#select-page-size").val());
+			SubmitForm();
+		}
+
+		function SortByChange() {
+			$("#sort-by-form").val($("#select-sort-by").val());
+			SubmitForm();
+		}
+
+		function RedirectEpisode(e)
+		{
+			$(e).parent().submit();
+		}
+	</script>
+}

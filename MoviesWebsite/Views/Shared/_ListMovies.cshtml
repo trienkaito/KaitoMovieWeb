@@ -1,0 +1,83 @@
+﻿@using static MoviesWebsite.Controllers.ViewMoviesController
+@model ViewCategory
+
+<style>
+    .img-movie {
+        height:255px;
+        width:170px;
+        object-fit:cover;
+    }
+</style>
+
+@foreach (var item in Model.Movies)
+{
+    <div class="movie-item-style-2">
+        @if (!string.IsNullOrWhiteSpace(item.Image))
+        {
+            <img class="img-movie" src="@item.Image" alt="">
+        }
+        else
+        {
+            <img class="img-movie" src="/Uploads/nophoto.png" alt="">
+        }
+        <div class="mv-item-infor">
+            <h6>
+                <a asp-area="" asp-controller="Home" asp-action="Detail" asp-route-slug="@item.Slug">
+                    @item.Title @{
+                        if (item.ReleaseDate != null)
+                        {
+                            <span>(@item.ReleaseDate?.Year)</span>
+                        }
+                    }
+                </a>
+            </h6>
+            <p class="rate"><i class="ion-android-star"></i>
+                <span>@Math.Round(item.Rate != null ? item.Rate.Value : 0, 1)</span> /10
+                <span style="margin-left: 20px; color: #FFDB00">@item.View Views</span>
+            </p>
+            @{
+
+                if (item.Description != null)
+                {
+                    int lenght = 150;
+                    if (item.Description.Length > lenght)
+                    {
+                        <p class="describe">
+                            @(item.Description.Substring(0, lenght) + "...")
+                        </p>
+                    }
+                    else
+                    {
+                        <p class="describe">
+                            @item.Description
+                        </p>
+                    }
+                }
+                if (item.ReleaseDate != null)
+                {
+                    <p class="run-time">Release: @item.ReleaseDate?.ToShortDateString()</p>
+                }
+
+                var director = item.Actors?.FirstOrDefault(a => a.Role == "Director");
+                if (director != null)
+                {
+                    <p>Director: <a asp-area="" asp-action="Details" asp-controller="HomeActor" asp-route-id="@director.ActorId">@director.Name</a></p>
+                }
+
+                var actors = item.Actors?.Where(a => a.Role == "Actor").Take(3);
+                if (actors != null && actors.Count() > 0)
+                {
+                    <p>
+                        Stars:@{
+                            foreach (var actor in actors)
+                            {
+                                <a asp-area="" asp-action="Details" asp-controller="HomeActor" asp-route-id="@actor.ActorId">@actor.Name</a>
+                            }
+                        }
+                    </p>
+                }
+            }
+        </div>
+    </div>
+}
+

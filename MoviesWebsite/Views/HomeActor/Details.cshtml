@@ -1,0 +1,457 @@
+﻿@using MoviesWebsite.Data
+@model MoviesWebsite.Models.Movie.ActorDetailsViewModel
+
+<style>
+	.pagination-link {
+		margin-right: 5px;
+	}
+</style>
+
+<div class="hero hero3">
+	<div class="container">
+		<div class="row">
+			<div class="col-md-12">
+				<!-- <h1> movie listing - list</h1>
+				<ul class="breadcumb">
+					<li class="active"><a href="#">Home</a></li>
+					<li> <span class="ion-ios-arrow-right"></span> movie listing</li>
+				</ul> -->
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="page-single movie-single cebleb-single">
+	<div class="container">
+		<div class="row ipad-width">
+			<div class="col-md-4 col-sm-12 col-xs-12">
+				<div class="mv-ceb">
+					@if (!string.IsNullOrEmpty(Model.Actor.Image))
+					{
+						<img src="@Model.Actor.Image" alt="" />
+					}
+					else
+					{
+						<img src="/contents/avata.jpg" alt="" />
+					}
+				</div>
+			</div>
+			<div class="col-md-8 col-sm-12 col-xs-12">
+				<div class="movie-single-ct">
+					<h1 class="bd-hd">@Model.Actor.Name</h1>
+					<p class="ceb-single">@Model.Actor.Role</p>
+					<div class="social-link cebsingle-socail">
+						<a href="#"><i class="ion-social-facebook"></i></a>
+						<a href="#"><i class="ion-social-twitter"></i></a>
+						<a href="#"><i class="ion-social-googleplus"></i></a>
+						<a href="#"><i class="ion-social-linkedin"></i></a>
+					</div>
+					<div class="movie-tabs">
+						<div class="tabs">
+							<ul class="tab-links tabs-mv" id="actorTab" role="tablist">
+								<li class="@(ViewBag.ActiveTab == "overview" ? "active" : "")">
+									<a class="nav-link @(ViewBag.ActiveTab == "overview" ? "active" : "")" id="overview-tab" href="@Url.Action("Details", new { id = ViewBag.ActorId, activeTab = "overview" })">Overview</a>
+								</li>
+								<li class="@(ViewBag.ActiveTab == "biography" ? "active" : "")">
+									<a class="nav-link @(ViewBag.ActiveTab == "biography" ? "active" : "")" id="biography-tab" href="@Url.Action("Details", new { id = ViewBag.ActorId, activeTab = "biography" })">Biography</a>
+								</li>
+@* 								<li class="@(ViewBag.ActiveTab == "media" ? "active" : "")">
+									<a class="nav-link @(ViewBag.ActiveTab == "media" ? "active" : "")" id="media-tab" href="@Url.Action("Details", new { id = ViewBag.ActorId, activeTab = "media" })">Media</a>
+								</li> *@
+								<li class="@(ViewBag.ActiveTab == "filmography" ? "active" : "")">
+									<a class="nav-link @(ViewBag.ActiveTab == "filmography" ? "active" : "")" id="filmography-tab" href="@Url.Action("Details", new { id = ViewBag.ActorId, activeTab = "filmography" })">Filmography</a>
+								</li>
+							</ul>
+
+							<div class="tab-content">
+								<div id="overview" class="tab @(ViewBag.ActiveTab == "overview" ? "active" : "")">
+									<div class="row">
+										<div class="col-md-8 col-sm-12 col-xs-12">
+											<p>
+												Jackman was born in Sydney, New South Wales, to Grace McNeil (Greenwood) and Christopher John Jackman, an
+												accountant. He is the youngest of five children. His parents both English, moved to Australia shortly before his birth.
+												He also has Greek (from a great-grandfather) and Scottish (from a grandmother) ancestry.
+											</p>
+											<p>Hugh Michael Jackman is an Australian actor, singer, multi-instrumentalist, dancer and producer. Jackman has won international recognition for his roles in major films, notably as superhero, period, and romance characters. </p>
+											<div class="mvsingle-item ov-item">
+												<a class="img-lightbox" data-fancybox-group="gallery" href="images/uploads/image11.jpg"><img src="images/uploads/image1.jpg" alt=""></a>
+												<a class="img-lightbox" data-fancybox-group="gallery" href="images/uploads/image21.jpg"><img src="images/uploads/image2.jpg" alt=""></a>
+												<a class="img-lightbox" data-fancybox-group="gallery" href="images/uploads/image31.jpg"><img src="images/uploads/image3.jpg" alt=""></a>
+												<div class="vd-it">
+													<img class="vd-img" src="images/uploads/image4.jpg" alt="">
+													<a class="fancybox-media hvr-grow" href="https://www.youtube.com/embed/o-0hcF97wy0"><img src="images/uploads/play-vd.png" alt=""></a>
+												</div>
+											</div>
+											<div class="title-hd-sm">
+												<h4>latest filmography</h4>
+												<a <a asp-action="Details"
+												   asp-route-slug="@ViewBag.ActorId"
+												   asp-route-activeTab="filmography"
+												   class="time">Full Filmography<i class="ion-ios-arrow-right"></i></a>
+											</div>
+											<!-- movie cast -->
+											<div class="mvcast-item">
+												@if (Model.LatestMovies != null && Model.LatestMovies.Any())
+												{
+													@foreach (var item in Model.LatestMovies)
+													{
+														<div class="cast-it">
+															<div class="cast-left cebleb-film">
+																@if (!string.IsNullOrEmpty(item.Image))
+																{
+																	<img src="@item.Image" width="70px" height="auto" alt="">
+																}
+																else
+																{
+																	<img src="/contents/nophoto.png" width="70px" height="auto" alt="" style="object-fit: cover;" />
+																}
+																<div>
+																	<a asp-controller="Home" asp-action="Detail" asp-route-slug="@item.Slug">@item.Title</a>
+																	<p class="time">Logan</p>
+																</div>
+															</div>
+															<p>
+																...   @if (item.ReleaseDate.HasValue)
+																{
+																	@item.ReleaseDate.Value.Year
+																}
+																else
+																{
+																	<span>Unknown</span>
+																}
+															</p>
+														</div>
+													}
+												}
+												else
+												{
+													<p class="text-danger font-weight-bold fs-25">No movies found for this actor.</p>
+												}
+											</div>
+										</div>
+										<div class="col-md-4 col-xs-12 col-sm-12">
+											<div class="sb-it">
+												<h6>Fullname:  </h6>
+												<p><a href="#">@Model.Actor.Name</a></p>
+											</div>
+											<div class="sb-it">
+												<h6>Date of Birth: </h6>
+												<p>June 24, 1982</p>
+											</div>
+											<div class="sb-it">
+												<h6>Country:  </h6>
+												<p>Australian</p>
+											</div>
+											<div class="sb-it">
+												<h6>Height:</h6>
+												<p>186 cm/p>
+											</div>
+											<div class="sb-it">
+												<h6>Keywords:</h6>
+												<p class="tags">
+													<span class="time"><a href="#">jackman</a></span>
+													<span class="time"><a href="#">wolverine</a></span>
+													<span class="time"><a href="#">logan</a></span>
+													<span class="time"><a href="#">blockbuster</a></span>
+													<span class="time"><a href="#">final battle</a></span>
+												</p>
+											</div>
+											<div class="ads">
+												<img src="images/uploads/ads1.png" alt="">
+											</div>
+										</div>
+									</div>
+								</div>
+								<div id="biography" style="margin-left: 10px;" class="tab @(ViewBag.ActiveTab == "biography" ? "active" : "")">
+									<div class="row">
+										<div class="rv-hd">
+											<div>
+												<h3>Biography of</h3>
+												<h2>@Model.Actor.Name</h2>
+											</div>
+										</div>
+										<p>Hugh Michael Jackman is an Australian actor, singer, multi-instrumentalist, dancer and producer. Jackman has won international recognition for his roles in major films, notably as superhero, period, and romance characters. He is best known for his long-running role as Wolverine in the X-Men film series, as well as for his lead roles in the romantic-comedy fantasy Kate & Leopold (2001), the action-horror film Van Helsing (2004), the drama The Prestige and The Fountain (2006), the epic historical romantic drama Australia (2008), the film version of Les Misérables (2012), and the thriller Prisoners (2013). His work in Les Misérables earned him his first Academy Award nomination for Best Actor and his first Golden Globe Award for Best Actor - Motion Picture Musical or Comedy in 2013. In Broadway theatre, Jackman won a Tony Award for his role in The Boy from Oz. A four-time host of the Tony Awards themselves, he won an Emmy Award for one of these appearances. Jackman also hosted the 81st Academy Awards on 22 February 2009.</p>
+
+										<p>Jackman was born in Sydney, New South Wales, to Grace McNeil (Greenwood) and Christopher John Jackman, an accountant. He is the youngest of five children. His parents, both English, moved to Australia shortly before his birth. He also has Greek (from a great-grandfather) and Scottish (from a grandmother) ancestry.</p>
+										<p>Jackman has a communications degree with a journalism major from the University of Technology Sydney. After graduating, he pursued drama at the Western Australian Academy of Performing Arts, immediately after which he was offered a starring role in the ABC-TV prison drama Correlli (1995), opposite his future wife Deborra-Lee Furness. Several TV guest roles followed, as an actor and variety compere. An accomplished singer, Jackman has starred as Gaston in the Australian production of "Beauty and the Beast." He appeared as Joe Gillis in the Australian production of "Sunset Boulevard." In 1998, he was cast as Curly in the Royal National Theatre's production of Trevor Nunn's Oklahoma. Jackman has made two feature films, the second of which, Erskineville Kings (1999), garnered him an Australian Film Institute nomination for Best Actor in 1999. Recently, he won the part of Logan/Wolverine in the Bryan Singer- directed comic-book movie X-Men (2000). In his spare time, Jackman plays piano, golf, and guitar, and likes to windsurf.</p>
+										<p>
+											On turning down the chance to play Richard Gere's character in the Harvey Weinstein-produced film Chicago (2002): I thought I was too young for the role. You have some 34-year-old guy up against Catherine Zeta-Jones and Renée Zellweger and it becomes a different movie. At one point, Harvey was telling me they were thinking of Kevin Spacey, and Ivtold him, 'That's exactly right. You should hire him.' Then I was in New York when the movie opened and the queue was around the block. I sat down and thought that I had probably made the biggest mistake. But I still honestly think that it was the right thing to do. I still think I was too young for that part.
+										</p>
+									</div>
+								</div>
+@* 								<div id="media" style="margin-left: 10px;" class="tab @(ViewBag.ActiveTab == "media" ? "active" : "")">
+									<div class="row">
+										<div class="rv-hd">
+											<div>
+												<h3>Biography of</h3>
+												<h2>@Model.Actor.Name</h2>
+											</div>
+										</div>
+										<div class="title-hd-sm">
+											<h4>Videos <span>(8)</span></h4>
+										</div>
+										<div class="mvsingle-item media-item">
+											<div class="vd-item">
+												<div class="vd-it">
+													<img class="vd-img" src="/client/images/uploads/vd-item1.jpg" alt="">
+													<a class="fancybox-media hvr-grow" href="https://www.youtube.com/embed/o-0hcF97wy0"><img src="/client/images/uploads/play-vd.png" alt=""></a>
+												</div>
+												<div class="vd-infor">
+													<h6> <a href="#">Trailer:  Watch New Scenes</a></h6>
+													<p class="time"> 1: 31</p>
+												</div>
+											</div>
+											<div class="vd-item">
+												<div class="vd-it">
+													<img class="vd-img" src="/client/images/uploads/vd-item2.jpg" alt="">
+													<a class="fancybox-media hvr-grow" href="https://www.youtube.com/embed/o-0hcF97wy0"><img src="/client/images/uploads/play-vd.png" alt=""></a>
+												</div>
+												<div class="vd-infor">
+													<h6> <a href="#">Featurette: “Avengers Re-Assembled</a></h6>
+													<p class="time"> 1: 03</p>
+												</div>
+											</div>
+											<div class="vd-item">
+												<div class="vd-it">
+													<img class="vd-img" src="/client/images/uploads/vd-item3.jpg" alt="">
+													<a class="fancybox-media hvr-grow" href="https://www.youtube.com/embed/o-0hcF97wy0"><img src="/client/images/uploads/play-vd.png" alt=""></a>
+												</div>
+												<div class="vd-infor">
+													<h6> <a href="#">Interview: Robert Downey Jr</a></h6>
+													<p class="time"> 3:27</p>
+												</div>
+											</div>
+											<div class="vd-item">
+												<div class="vd-it">
+													<img class="vd-img" src="/client/images/uploads/vd-item4.jpg" alt="">
+													<a class="fancybox-media hvr-grow" href="https://www.youtube.com/embed/o-0hcF97wy0"><img src="/client/images/uploads/play-vd.png" alt=""></a>
+												</div>
+												<div class="vd-infor">
+													<h6> <a href="#">Interview: Scarlett Johansson</a></h6>
+													<p class="time"> 3:27</p>
+												</div>
+											</div>
+											<div class="vd-item">
+												<div class="vd-it">
+													<img class="vd-img" src="/client/images/uploads/vd-item4.jpg" alt="">
+													<a class="fancybox-media hvr-grow" href="https://www.youtube.com/embed/o-0hcF97wy0"><img src="/client/images/uploads/play-vd.png" alt=""></a>
+												</div>
+												<div class="vd-infor">
+													<h6> <a href="#">Interview: Scarlett Johansson</a></h6>
+													<p class="time"> 3:27</p>
+												</div>
+											</div>
+											<div class="vd-item">
+												<div class="vd-it">
+													<img class="vd-img" src="/client/images/uploads/vd-item4.jpg" alt="">
+													<a class="fancybox-media hvr-grow" href="https://www.youtube.com/embed/o-0hcF97wy0"><img src="/client/images/uploads/play-vd.png" alt=""></a>
+												</div>
+												<div class="vd-infor">
+													<h6> <a href="#">Interview: Scarlett Johansson</a></h6>
+													<p class="time"> 3:27</p>
+												</div>
+											</div>
+											<div class="vd-item">
+												<div class="vd-it">
+													<img class="vd-img" src="/client/images/uploads/vd-item1.jpg" alt="">
+													<a class="fancybox-media hvr-grow" href="https://www.youtube.com/embed/o-0hcF97wy0"><img src="/client/images/uploads/play-vd.png" alt=""></a>
+												</div>
+												<div class="vd-infor">
+													<h6> <a href="#">Featurette: Meet Quicksilver & The Scarlet Witch</a></h6>
+													<p class="time"> 1: 31</p>
+												</div>
+											</div>
+											<div class="vd-item">
+												<div class="vd-it">
+													<img class="vd-img" src="/client/images/uploads/vd-item2.jpg" alt="">
+													<a class="fancybox-media hvr-grow" href="https://www.youtube.com/embed/o-0hcF97wy0"><img src="/client/images/uploads/play-vd.png" alt=""></a>
+												</div>
+												<div class="vd-infor">
+													<h6> <a href="#">Interview: Director Joss Whedon</a></h6>
+													<p class="time"> 1: 03</p>
+												</div>
+											</div>
+											<div class="vd-item">
+												<div class="vd-it">
+													<img class="vd-img" src="/client/images/uploads/vd-item3.jpg" alt="">
+													<a class="fancybox-media hvr-grow" href="https://www.youtube.com/embed/o-0hcF97wy0"><img src="/client/images/uploads/play-vd.png" alt=""></a>
+												</div>
+												<div class="vd-infor">
+													<h6> <a href="#">Interview: Mark Ruffalo</a></h6>
+													<p class="time"> 3:27</p>
+												</div>
+											</div>
+											<div class="vd-item">
+												<div class="vd-it">
+													<img class="vd-img" src="/client/images/uploads/vd-item4.jpg" alt="">
+													<a class="fancybox-media hvr-grow" href="https://www.youtube.com/embed/o-0hcF97wy0"><img src="/client/images/uploads/play-vd.png" alt=""></a>
+												</div>
+												<div class="vd-infor">
+													<h6> <a href="#">Official Trailer #2</a></h6>
+													<p class="time"> 3:27</p>
+												</div>
+											</div>
+											<div class="vd-item">
+												<div class="vd-it">
+													<img class="vd-img" src="/client/images/uploads/vd-item4.jpg" alt="">
+													<a class="fancybox-media hvr-grow" href="https://www.youtube.com/embed/o-0hcF97wy0"><img src="/client/images/uploads/play-vd.png" alt=""></a>
+												</div>
+												<div class="vd-infor">
+													<h6> <a href="#">Official Trailer #2</a></h6>
+													<p class="time"> 3:27</p>
+												</div>
+											</div>
+											<div class="vd-item">
+												<div class="vd-it">
+													<img class="vd-img" src="/client/images/uploads/vd-item4.jpg" alt="">
+													<a class="fancybox-media hvr-grow" href="https://www.youtube.com/embed/o-0hcF97wy0"><img src="/client/images/uploads/play-vd.png" alt=""></a>
+												</div>
+												<div class="vd-infor">
+													<h6> <a href="#">Official Trailer #2</a></h6>
+													<p class="time"> 3:27</p>
+												</div>
+											</div>
+										</div>
+										<div class="title-hd-sm">
+											<h4>Photos <span> (21)</span></h4>
+										</div>
+										<div class="mvsingle-item">
+											<a class="img-lightbox" data-fancybox-group="gallery" href="/client/images/uploads/image11.jpg"><img src="/client/images/uploads/image1.jpg" alt=""></a>
+											<a class="img-lightbox" data-fancybox-group="gallery" href="/client/images/uploads/image21.jpg"><img src="/client/images/uploads/image2.jpg" alt=""></a>
+											<a class="img-lightbox" data-fancybox-group="gallery" href="/client/images/uploads/image31.jpg"><img src="/client/images/uploads/image3.jpg" alt=""></a>
+											<a class="img-lightbox" data-fancybox-group="gallery" href="/client/images/uploads/image41.jpg"><img src="/client/images/uploads/image4.jpg" alt=""></a>
+											<a class="img-lightbox" data-fancybox-group="gallery" href="/client/images/uploads/image51.jpg"><img src="/client/images/uploads/image5.jpg" alt=""></a>
+											<a class="img-lightbox" data-fancybox-group="gallery" href="/client/images/uploads/image61.jpg"><img src="/client/images/uploads/image6.jpg" alt=""></a>
+											<a class="img-lightbox" data-fancybox-group="gallery" href="/client/images/uploads/image71.jpg"><img src="/client/images/uploads/image7.jpg" alt=""></a>
+											<a class="img-lightbox" data-fancybox-group="gallery" href="/client/images/uploads/image81.jpg"><img src="/client/images/uploads/image8.jpg" alt=""></a>
+											<a class="img-lightbox" data-fancybox-group="gallery" href="/client/images/uploads/image91.jpg"><img src="/client/images/uploads/image9.jpg" alt=""></a>
+											<a class="img-lightbox" data-fancybox-group="gallery" href="/client/images/uploads/image101.jpg"><img src="/client/images/uploads/image10.jpg" alt=""></a>
+											<a class="img-lightbox" data-fancybox-group="gallery" href="/client/images/uploads/image111.jpg"><img src="/client/images/uploads/image1-1.jpg" alt=""></a>
+											<a class="img-lightbox" data-fancybox-group="gallery" href="/client/images/uploads/image121.jpg"><img src="/client/images/uploads/image12.jpg" alt=""></a>
+											<a class="img-lightbox" data-fancybox-group="gallery" href="/client/images/uploads/image131.jpg"><img src="/client/images/uploads/image13.jpg" alt=""></a>
+											<a class="img-lightbox" data-fancybox-group="gallery" href="/client/images/uploads/image141.jpg"><img src="/client/images/uploads/image14.jpg" alt=""></a>
+											<a class="img-lightbox" data-fancybox-group="gallery" href="/client/images/uploads/image151.jpg"><img src="/client/images/uploads/image15.jpg" alt=""></a>
+											<a class="img-lightbox" data-fancybox-group="gallery" href="/client/images/uploads/image161.jpg"><img src="/client/images/uploads/image16.jpg" alt=""></a>
+											<a class="img-lightbox" data-fancybox-group="gallery" href="/client/images/uploads/image171.jpg"><img src="/client/images/uploads/image17.jpg" alt=""></a>
+											<a class="img-lightbox" data-fancybox-group="gallery" href="/client/images/uploads/image181.jpg"><img src="/client/images/uploads/image18.jpg" alt=""></a>
+											<a class="img-lightbox" data-fancybox-group="gallery" href="/client/images/uploads/image191.jpg"><img src="/client/images/uploads/image19.jpg" alt=""></a>
+											<a class="img-lightbox" data-fancybox-group="gallery" href="/client/images/uploads/image201.jpg"><img src="/client/images/uploads/image20.jpg" alt=""></a>
+											<a class="img-lightbox" data-fancybox-group="gallery" href="/client/images/uploads/image211.jpg"><img src="/client/images/uploads/image2-1.jpg" alt=""></a>
+										</div>
+									</div>
+								</div>
+ *@								<div id="filmography" style="margin-left: 10px;" class="tab @(ViewBag.ActiveTab == "filmography" ? "active" : "")">
+									<div class="row">
+										<div class="rv-hd">
+											<div>
+												<h3>Biography of</h3>
+												<h2>@Model.Actor.Name</h2>
+											</div>
+										</div>
+										<div class="topbar-filter">
+											<p>Found <span>@Model.Movies.Count()  movies</span> in total</p>
+											@* 	<label>Filter by:</label>
+											<select>
+											<option value="popularity">Popularity Descending</option>
+											<option value="popularity">Popularity Ascending</option>
+											<option value="rating">Rating Descending</option>
+											<option value="rating">Rating Ascending</option>
+											<option value="date">Release date Descending</option>
+											<option value="date">Release date Ascending</option>
+											</select> *@
+										</div>
+										<!-- movie cast -->
+										<div class="mvcast-item">
+											@if (Model.Movies != null && Model.Movies.Any())
+											{
+												@foreach (var item in Model.Movies)
+												{
+													<div class="cast-it">
+														<div class="cast-left cebleb-film">
+															@if (!string.IsNullOrEmpty(item.Image))
+															{
+																<img src="@item.Image" width="70px" height="auto" alt="">
+															}
+															else
+															{
+																<img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRkK98VBjmf1Q6_3SC9Nmz8CILkBdm1BUiFLg&s" width="70px" height="auto" alt="" style="object-fit: cover;" />
+															}
+															<div>
+																<a asp-controller="Home" asp-action="Detail" asp-route-slug="@item.Slug">@item.Title</a>
+																<p class="time">Logan</p>
+															</div>
+														</div>
+														<p>
+															...   @if (item.ReleaseDate.HasValue)
+															{
+																@item.ReleaseDate.Value.Year
+															}
+															else
+															{
+																<span>Unknown</span>
+															}
+														</p>
+													</div>
+												}
+											}
+											@* 	else
+											{
+											<p class="text-danger font-weight-bold fs-25">No movies found for this actor.</p>
+											} *@
+										</div>
+
+										<!-- Pagination -->
+										@if (Model.Movies.Any())
+										{
+											<div class="topbar-filter">
+												<div class="pagination2">
+													<span>Page @ViewBag.CurrentPage of @ViewBag.PageCount</span>
+
+													<!-- Hide Previous button if on the first page -->
+													@if (ViewBag.CurrentPage > 1)
+													{
+														<a href="@Url.Action("Details", new { id = ViewBag.ActorId, currentPage = ViewBag.CurrentPage - 1, pageSize = ViewBag.PageSize, activeTab = ViewBag.ActiveTab })" class="pagination-link prev">
+															<i class="ion-arrow-left-b"></i>
+														</a>
+													}
+
+													<!-- Display page numbers -->
+													@for (int i = 1; i <= ViewBag.PageCount; i++)
+													{
+														if (i == ViewBag.CurrentPage)
+														{
+															<a class="active" href="#">@i</a>
+														}
+														else
+														{
+															<a href="@Url.Action("Details", new { id = ViewBag.ActorId, currentPage = i, pageSize = ViewBag.PageSize, activeTab = ViewBag.ActiveTab })" class="pagination-link">
+																@i
+															</a>
+														}
+													}
+
+													<!-- Hide Next button if on the last page -->
+													@if (ViewBag.CurrentPage < ViewBag.PageCount)
+													{
+														<a href="@Url.Action("Details", new { id = ViewBag.ActorId, currentPage = ViewBag.CurrentPage + 1, pageSize = ViewBag.PageSize, activeTab = ViewBag.ActiveTab })" class="pagination-link next">
+															<i class="ion-arrow-right-b"></i>
+														</a>
+													}
+												</div>
+											</div>
+										}
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="col-6 col-md-2 offset-lg-1 pb-1">
+				<a asp-action="Index" style="display: inline-block; padding: 0.5rem 1rem; border: 1px solid #007bff; color: #007bff; text-transform: uppercase; text-decoration: none; border-radius: 0.25rem;">
+					<small>Back to home</small>
+				</a>
+			</div>
+		</div>
+	</div>
+</div>

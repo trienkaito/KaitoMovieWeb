@@ -1,0 +1,29 @@
+﻿@model IEnumerable<MoviesWebsite.Models.Movie.Comment>
+<div class="comments-section">
+    @foreach (var comment in Model)
+    {
+
+        <div class=" mv-user-review-item d-flex align-items-start" style="display: flex; flex-direction: column;gap: 12px;">
+            <div class="user-avatar me-3">
+                @if (comment.User?.Avatar != null)
+                {
+                    <img src="@comment.User.Avatar" alt="User Avatar" class="img-fluid rounded-circle">
+                }
+                else
+                {
+                    <img src="/contents/avata.jpg" alt="User Avatar" class="img-fluid rounded-circle">
+                }
+            </div>
+            <div class="user-infor" style="max-width: 600px;">
+                <div>
+                    <p class="time mb-1">
+                        @comment.CreatedDate by <a href="#"> @comment.User?.UserName</a>
+                    </p>
+                </div>
+                <p class="review-text">
+                    @comment.Content
+                </p>
+            </div>
+        </div>
+    }
+</div>

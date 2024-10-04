@@ -1,0 +1,63 @@
+﻿@model MoviesWebsite.Models.Movie.Category
+
+<div class="modal fade" id="addCategory" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content" style="width: 700px">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Category</h5>
+                <button class="close" type="button" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form method="post" asp-action="Create" id="addCategoryForm" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label asp-for="Title" class="control-label"></label>
+                        <input asp-for="Title" id="title" class="form-control" placeholder="Enter @Html.DisplayNameFor(model => model.Title).ToLower()" />
+                        <span asp-validation-for="Title" class="text-danger" id="categoryTitleError"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Description" class="control-label"></label>
+                        <textarea asp-for="Description" class="form-control" placeholder="Enter @Html.DisplayNameFor(model => model.Description).ToLower()"></textarea>
+                        <span asp-validation-for="Description" class="text-danger"></span>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button class="btn btn-primary" onclick="CheckExitCategory()" type="button">Add</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<partial name="_ValidationScriptsPartial" />
+
+<script>
+    function CheckExitCategory() {
+        var title = $("#title").val().trim();
+        console.log(title);
+
+        if (title) {
+            $.ajax({
+                url: '@Url.Action("CheckCategoryExists", "Categories")',
+                type: 'GET',
+                data: { title: title },
+                success: function (response) {
+                    if (response) {
+                        $('#categoryTitleError').text('Title has already existed.');
+                    } else {
+                        $('#categoryTitleError').text('');
+                        $("#addCategoryForm").submit();
+                    }
+                },
+                error: function () {
+                    console.log("An error occurred while checking category title.");
+                }
+            });
+        } else {
+            $('#categoryTitleError').text('Title is required.');
+        }
+    }
+</script>
